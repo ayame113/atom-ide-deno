@@ -8,7 +8,7 @@
 		"JavaScript",
 		"TypeScript"
 	],
-	"repository": "<リポジトリのURL>",
+	"repository": "https://github.com/ayame113/atom-ide-deno",
 	"license": "MIT",
 	"engines": {
 		"atom": ">=1.0.0 <2.0.0"

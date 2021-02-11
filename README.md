@@ -1,36 +1,42 @@
 # atom-deno-lsp
 
-deno language serverによる、Atom-IDEのdenoサポート
+Javascript and TypeScript language support for Atom-IDE, powered by the deno language server.
 
-## 要件
+## Requirements
 
-この拡張機能を使用するには、[deno](https://deno.land/) 1.6.0以上が必要です。
+You must have [deno](https://deno.land/) 1.6.0 or higher to use this extension.
 
-## 機能
+## Feature
 
-この拡張機能はAtom-IDEからdeno language serverを使用する最低限の機能を提供します。
+This extension provides the minimum functionality to use the deno language server with the Atom-IDE.
 
-### サポート
+### Support
 
- - リンター
- - 補完
+ - Linter
+ - Complement
 
-deno lspは現在作業中のようです。denoのバージョンアップによって機能が追加されていくはずです。
+deno lsp seems to be working now. Features may be added as the development of deno lsp progresses.
 
-### 未サポート
+### Not supported
 
- - フォーマッタ
- - デバッガー
- - `deno cache`などの追加機能
+ - Formatter
+ - Debugger
+ - `deno cache` command
 
-実装には更に調査が必要です。
+Further investigation is required for implementation.
 
-## 貢献
+## Contribution
 
-この拡張機能は最小限の実装です。実装を追加する場合は、その機能がlsp側とこのパッケージのどちらで実装されるものか調べる必要があります。(フォーマッタなど)
+This extension is a minimal implementation. If you add an implementation, you need to find out whether the feature is implemented on the lsp side or in this package. (formatter etc.)
 
-デバッガーの実装のために[xatom-debug-nodejs](https://github.com/xatom-plugins/xatom-debug-nodejs)を試しましたが、上手くいきませんでした。
-デバッガーを実装するもう一つの手段である[atom-ide-javascript](https://github.com/atom-community/atom-ide-javascript)は、中でvscode拡張を呼び出しているようです。理論上は`node --inspect-brk`を`deno run --inspect-brk`に書き換えるだけですが、typescriptの実行方法の違いを処理する必要があります。更に調査が必要です。
+I tried [xatom-debug-nodejs](https://github.com/xatom-plugins/xatom-debug-nodejs) to implement the debugger, but it didn't work.
 
-コントリビュートはお気軽にどうぞ。
-このパッケージの開発を引き継ぎたい人はお気軽にお声がけください。
+Another way to implement the debugger, [atom-ide-javascript](https://github.com/atom-community/atom-ide-javascript), seems to call the vscode extension inside. Theoretically, I only need to rewrite `node --inspect-brk` to` deno run --inspect-brk`, but I have to deal with the difference in how typescript is executed. Further investigation is needed.
+
+Feel free to contribute.
+Feel free to contact us if you would like to take over the development of this package.
+
+
+## License
+
+It is an MIT license.
