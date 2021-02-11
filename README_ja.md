@@ -29,6 +29,15 @@ deno lspは現在作業中のようです。denoのバージョンアップに�
 
 実装には更に調査が必要です。
 
+## インストール
+
+設定＞インストール＞`atom-ide-deno`で検索＞インストール
+
+または、コマンドラインで`apm install atom-ide-deno`
+
+追加で[atom-ide-base](https://atom.io/packages/atom-ide-base)パッケージをインストールすると、機能が増えます。詳しくは[こちら](https://atom-community.github.io/)。
+
+
 ## 貢献
 
 この拡張機能は最小限の実装です。実装を追加する場合は、その機能がlsp側とこのパッケージのどちらで実装されるものか調べる必要があります。(フォーマッタなど)

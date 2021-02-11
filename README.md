@@ -29,6 +29,14 @@ deno lsp seems to be working now. Features may be added as the development of de
 
 Further investigation is required for implementation.
 
+## Installation
+
+Settings > Install > search `atom-ide-deno` > install button
+
+or run the following from the command line:, `apm install atom-ide-deno`
+
+Installing the additional [atom-ide-base](https://atom.io/packages/atom-ide-base) package will increase the functionality. For more information, [click here](https://atom-community.github.io/).
+
 ## Contribution
 
 This extension is a minimal implementation. If you add an implementation, you need to find out whether the feature should be implemented on the lsp side or in this package. (formatter etc.)
