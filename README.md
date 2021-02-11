@@ -2,6 +2,10 @@
 
 Javascript and TypeScript language support for Atom-IDE, powered by the deno language server.
 
+[日本語バージョンはこちら](./README_ja.md)
+
+![image](https://user-images.githubusercontent.com/40050810/107709560-bba12c00-6d08-11eb-8c45-4e66b51d3da8.png)
+
 ## Requirements
 
 You must have [deno](https://deno.land/) 1.6.0 or higher to use this extension.

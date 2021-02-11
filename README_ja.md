@@ -2,6 +2,10 @@
 
 deno language serverによる、Atom-IDEのdenoサポート
 
+[English version](./README.md)
+
+![image](https://user-images.githubusercontent.com/40050810/107709560-bba12c00-6d08-11eb-8c45-4e66b51d3da8.png)
+
 ## 要件
 
 この拡張機能を使用するには、[deno](https://deno.land/) 1.6.0以上が必要です。
