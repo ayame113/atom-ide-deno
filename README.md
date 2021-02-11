@@ -27,7 +27,7 @@ Further investigation is required for implementation.
 
 ## Contribution
 
-This extension is a minimal implementation. If you add an implementation, you need to find out whether the feature is implemented on the lsp side or in this package. (formatter etc.)
+This extension is a minimal implementation. If you add an implementation, you need to find out whether the feature should be implemented on the lsp side or in this package. (formatter etc.)
 
 I tried [xatom-debug-nodejs](https://github.com/xatom-plugins/xatom-debug-nodejs) to implement the debugger, but it didn't work.
 
