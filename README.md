@@ -19,7 +19,7 @@ This extension provides the minimum functionality to use the deno language serve
  - Linter
  - Complement
 
-deno lsp seems to be working now. Features may be added as the development of deno lsp progresses.
+deno lsp seems to be developping now. Features may be added as the development of deno lsp progresses.
 
 ### Not supported
 
@@ -33,7 +33,10 @@ Further investigation is required for implementation.
 
 Settings > Install > search `atom-ide-deno` > install button
 
-or run the following from the command line:, `apm install atom-ide-deno`
+or run the following from the command line,
+```
+apm install atom-ide-deno
+```
 
 Installing the additional [atom-ide-base](https://atom.io/packages/atom-ide-base) package will increase the functionality. For more information, [click here](https://atom-community.github.io/).
 
