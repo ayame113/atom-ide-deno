@@ -12,7 +12,7 @@ deno language serverによる、Atom-IDEのdenoサポート
 
 ## 機能
 
-この拡張機能はAtom-IDEからdeno language serverを使用する最低限の機能を提供します。
+この拡張機能はAtom-IDEからdeno language serverを使用できる最低限の機能を提供します。
 
 ### サポート
 
@@ -27,24 +27,29 @@ deno lspは現在作業中のようです。denoのバージョンアップに�
  - デバッガー
  - `deno cache`などの追加機能
 
-実装には更に調査が必要です。
+実装するには更に調査が必要です。
 
 ## インストール
 
 設定＞インストール＞`atom-ide-deno`で検索＞インストール
 
-または、コマンドラインで`apm install atom-ide-deno`
+または、コマンドラインで以下を入力
+```
+apm install atom-ide-deno
+```
 
-追加で[atom-ide-base](https://atom.io/packages/atom-ide-base)パッケージをインストールすると、機能が増えます。詳しくは[こちら](https://atom-community.github.io/)。
+追加で[atom-ide-base](https://atom.io/packages/atom-ide-base)パッケージをインストールすると使用できる機能が増えます。詳しくは[こちら](https://atom-community.github.io/)を参照。
 
 
 ## 貢献
 
-この拡張機能は最小限の実装です。実装を追加する場合は、その機能がlsp側とこのパッケージのどちらで実装されるものか調べる必要があります。(フォーマッタなど)
+この拡張機能は最小限の実装です。フォーマッタなどの機能を追加する場合、lspから機能が提供されるのか、拡張機能側でコマンド呼び出しを実装する必要があるのかを調べる必要があります。
 
-デバッガーの実装のために[xatom-debug-nodejs](https://github.com/xatom-plugins/xatom-debug-nodejs)を試しましたが、上手くいきませんでした。
+デバッガーの実装には`chrome devtool protocol`を使用する必要があります。理論上は、既存の拡張機能を使用して`node --inspect-brk`を`deno run --inspect-brk`に書き換えるだけです。
 
-デバッガーを実装するもう一つの手段である[atom-ide-javascript](https://github.com/atom-community/atom-ide-javascript)は、中でvscode拡張を呼び出しているようです。理論上は`node --inspect-brk`を`deno run --inspect-brk`に書き換えるだけですが、typescriptの実行方法の違いを処理する必要があります。更に調査が必要です。
+まず[xatom-debug-nodejs](https://github.com/xatom-plugins/xatom-debug-nodejs)を試しましたが、上手くいきませんでした。
+
+次に試した[atom-ide-javascript](https://github.com/atom-community/atom-ide-javascript)は、中でvscode拡張を呼び出しているようです。ここでtypescriptの実行方法の違いを処理する必要があります。更に調査が必要です。
 
 コントリビュートはお気軽にどうぞ。
 このパッケージの開発を引き継ぎたい人はお気軽にお声がけください。
