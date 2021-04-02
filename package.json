@@ -16,6 +16,73 @@
 	"dependencies": {
 		"atom-languageclient": "^1.0.7"
 	},
+	"configSchema": {
+		"lspFlags": {
+			"title": "lsp flags",
+			"description": "This setting is based on [vscode extention](https://github.com/denoland/vscode_deno)",
+			"type": "object",
+			"order": 1,
+			"properties": {
+				"enable": {
+					"title": "Enables language server",
+					"type": "boolean",
+					"default": true,
+					"order": 2
+				},
+				"codeLens": {
+					"type": "object",
+					"order": 3,
+					"properties": {
+						"implementations": {
+							"title": "Enables code lens implementations",
+							"type": "boolean",
+							"default": true,
+							"order": 4
+						},
+						"references": {
+							"title": "Enables code lens references",
+							"type": "boolean",
+							"default": true,
+							"order": 5
+						}
+					}
+				},
+				"lint": {
+					"title": "Enables lint",
+					"type": "boolean",
+					"default": true,
+					"order": 6
+				},
+				"importMap": {
+					"title": "Path to import-map",
+					"description": "Relative path from the project root",
+					"type": "string",
+					"default": "",
+					"order": 7
+				},
+				"config": {
+					"title": "Path to tsconfig",
+					"description": "Relative path from the project root",
+					"type": "string",
+					"default": "",
+					"order": 8
+				},
+				"unstable": {
+					"title": "Enables unstable",
+					"type": "boolean",
+					"default": false,
+					"order": 9
+				}
+			}
+		},
+		"path": {
+			"title": "Deno path",
+			"description": "Path to the deno executable.（ex. /usr/bin/deno、C:\\Program Files\\deno\\deno.exe）",
+			"type": "string",
+			"default": "",
+			"order": 10
+		}
+	},
 	"consumedServices": {
 		"linter-indie": {
 			"versions": {
