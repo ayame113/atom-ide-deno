@@ -55,14 +55,14 @@
 				},
 				"importMap": {
 					"title": "Path to import-map",
-					"description": "Relative path from the project root",
+					"description": "Relative path from the project root (ex. `./import-map/json`)",
 					"type": "string",
 					"default": "",
 					"order": 7
 				},
 				"config": {
 					"title": "Path to tsconfig",
-					"description": "Relative path from the project root",
+					"description": "Relative path from the project root (ex. `./tsconfig.json`)",
 					"type": "string",
 					"default": "",
 					"order": 8
@@ -77,7 +77,7 @@
 		},
 		"path": {
 			"title": "Deno path",
-			"description": "Path to the deno executable.（ex. /usr/bin/deno、C:\\Program Files\\deno\\deno.exe）",
+			"description": "Path to the deno executable.（ex. `/usr/bin/deno`, `C:\\Program Files\\deno\\deno.exe`）",
 			"type": "string",
 			"default": "",
 			"order": 10

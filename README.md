@@ -42,6 +42,40 @@ The configuration of the settings is similar to [vscode_deno](https://github.com
   - Enables unstable: Whether to use unstable APIs for code type checking
  - Deno path: Path to the Deno executable
 
+ ## tips
+
+ ### How to write tsconfig.json to enable dom in lsp
+ ```
+ {
+   "compilerOptions": {
+     "allowJs": true,
+     "esModuleInterop": true,
+     "experimentalDecorators": true,
+     "inlineSourceMap": true,
+     "isolatedModules": true,
+     "jsx": "react",
+     "lib": ["deno.window", "dom", "esnext"],
+     "module": "esnext",
+     "strict": true,
+     "target": "esnext",
+     "useDefineForClassFields": true
+   }
+ }
+ ```
+
+ ### How to write an importMap that matches the root to the project folder (place it directly under the project folder)
+ ```
+ {
+ 	"imports": {
+ 		"/": "./",
+ 		"./": "./"
+ 	}
+ }
+ ```
+
+
+ > ⚠️ After editing the importMap or tsconfig, either manually restart the editor or edit the options and restart the LSP.
+
  ## Contribution
 
 Feel free to contribute.

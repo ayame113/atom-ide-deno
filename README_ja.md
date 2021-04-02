@@ -45,6 +45,42 @@ apm install atom-ide-deno
   - Enables unstable: コードの型チェックに不安定なAPIを用いるかどうか
  - Deno path: Deno実行ファイルへのパス
 
+
+## tips
+
+### lspでdomを有効にするtsconfig.json
+```
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "inlineSourceMap": true,
+    "isolatedModules": true,
+    "jsx": "react",
+    "lib": ["deno.window", "dom", "esnext"],
+    "module": "esnext",
+    "strict": true,
+    "target": "esnext",
+    "useDefineForClassFields": true
+  }
+}
+```
+
+### ルートをプロジェクトフォルダに合わせるimportMap (プロジェクトフォルダ直下に置く)
+```
+{
+	"imports": {
+		"/": "./",
+		"./": "./"
+	}
+}
+```
+
+
+> ⚠️ importMapやtsconfigを編集した後は、手動でエディタを再起動するか、オプションを編集してLSPを再起動してください。
+
+
 ## 貢献
 
 コントリビュートはお気軽にどうぞ。
