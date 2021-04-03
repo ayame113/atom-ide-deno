@@ -2,6 +2,8 @@
 
 Javascript and TypeScript language support for Atom-IDE, powered by the deno language server.
 
+This is a package produced by the community (not the deno team).
+
 [English version](./README.md)
 
 ![screen shot](https://user-images.githubusercontent.com/40050810/107709560-bba12c00-6d08-11eb-8c45-4e66b51d3da8.png)
@@ -72,6 +74,10 @@ The configuration of the settings is similar to [vscode_deno](https://github.com
  	}
  }
  ```
+
+ ### Use different settings for each project
+
+Please use external packages such as [project-config](https://atom.io/packages/project-config) and [atomic-management](https://atom.io/packages/atomic-management).
 
 
  > ⚠️ After editing the importMap or tsconfig, either manually restart the editor or edit the options and restart the LSP.
