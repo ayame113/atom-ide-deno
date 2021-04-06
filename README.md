@@ -4,7 +4,7 @@ Javascript and TypeScript language support for Atom-IDE, powered by the deno lan
 
 This is a package produced by the community (not the deno team).
 
-[English version](./README.md)
+[日本語バージョン](./README_ja.md)
 
 ![screen shot](https://raw.githubusercontent.com/ayame113/atom-ide-deno/master/screenshot/1.png)
 
