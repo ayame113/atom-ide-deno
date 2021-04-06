@@ -1,3 +1,5 @@
+Translations: [English (en)](README.md) [日本語 (ja)](README.ja.md)
+
 # atom-ide-deno
 
 deno language serverによる、Atom-IDEのdenoサポート
