@@ -1,4 +1,4 @@
-# atom-deno-lsp
+# atom-ide-deno
 
 Javascript and TypeScript language support for Atom-IDE, powered by the deno language server.
 
@@ -29,6 +29,11 @@ or run the following from the command line,
 ```
 apm install atom-ide-deno
 ```
+
+## function
+
+You can only use the features available in both [atom-languageclient implemented list](https://github.com/atom-community/atom-languageclient#capabilities) and [deno implemented list](https://github.com/denoland/deno/issues/8643#issue-758171107).
+
 
 ## settings
 
@@ -78,6 +83,14 @@ The configuration of the settings is similar to [vscode_deno](https://github.com
  ### Use different settings for each project
 
 Please use external packages such as [project-config](https://atom.io/packages/project-config) and [atomic-management](https://atom.io/packages/atomic-management).
+
+### Debug mode
+
+Open the console with `ctrl-shift-i` and enter the following command.
+```
+atom.packages.activePackages['atom-ide-deno'].mainModule.isDebug = true
+atom.packages.activePackages['atom-ide-deno'].mainModule.restartAllServers()
+```
 
 
  > ⚠️ After editing the importMap or tsconfig, either manually restart the editor or edit the options and restart the LSP.

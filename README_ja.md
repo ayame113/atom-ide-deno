@@ -1,4 +1,4 @@
-# atom-deno-lsp
+# atom-ide-deno
 
 deno language serverによる、Atom-IDEのdenoサポート
 
@@ -32,6 +32,9 @@ apm install atom-ide-deno
 ```
 
 
+## 機能
+
+[atom-languageclientの実装済みリスト](https://github.com/atom-community/atom-languageclient#capabilities)と[denoの実装済みリスト](https://github.com/denoland/deno/issues/8643#issue-758171107)の両方で利用可能となっている機能が使用できます。
 
 ## 設定
 
@@ -82,6 +85,14 @@ apm install atom-ide-deno
 ### プロジェクトごとに異なる設定を利用する
 
 [project-config](https://atom.io/packages/project-config)や[atomic-management](https://atom.io/packages/atomic-management)などの外部パッケージを利用します。
+
+### デバッグモード
+
+`ctrl-shift-i`でコンソールを開き、以下のコマンドを入力
+```
+atom.packages.activePackages['atom-ide-deno'].mainModule.isDebug = true
+atom.packages.activePackages['atom-ide-deno'].mainModule.restartAllServers()
+```
 
 > ⚠️ importMapやtsconfigを編集した後は、手動でエディタを再起動するか、オプションを編集してLSPを再起動してください。
 
