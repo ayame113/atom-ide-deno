@@ -1,4 +1,7 @@
 ## 1.0.0
+ - supports Import Completions
+
+## 1.0.0
  - supports importMap
  - supports tsconfig
  - supports executable path
