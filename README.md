@@ -89,7 +89,6 @@ Please use external packages such as [project-config](https://atom.io/packages/p
 Open the console with `ctrl-shift-i` and enter the following command.
 ```
 atom.packages.activePackages['atom-ide-deno'].mainModule.isDebug = true
-atom.packages.activePackages['atom-ide-deno'].mainModule.restartAllServers()
 ```
 
 

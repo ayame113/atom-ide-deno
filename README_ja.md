@@ -90,7 +90,6 @@ apm install atom-ide-deno
 `ctrl-shift-i`でコンソールを開き、以下のコマンドを入力
 ```
 atom.packages.activePackages['atom-ide-deno'].mainModule.isDebug = true
-atom.packages.activePackages['atom-ide-deno'].mainModule.restartAllServers()
 ```
 
 > ⚠️ importMapやtsconfigを編集した後は、手動でエディタを再起動するか、オプションを編集してLSPを再起動してください。
