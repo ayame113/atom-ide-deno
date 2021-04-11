@@ -15,7 +15,7 @@ This is a package produced by the community (not the deno team).
 2. install this package
 3. install [atom-ide-base](https://atom.io/packages/atom-ide-base) package
 
-> ⚠️ `atom-ide-ui` package was not recommended
+> ⚠️ `atom-ide-ui` package was deprecated
 
 > ⚠️ The `atom-ide-javascript` package is for Node.js. It has nothing to do with this extension.
 
@@ -32,7 +32,7 @@ apm install atom-ide-deno
 
 ## function
 
-You can only use the features available in both [atom-languageclient implemented list](https://github.com/atom-community/atom-languageclient#capabilities) and [deno implemented list](https://github.com/denoland/deno/issues/8643#issue-758171107).
+Only features available in both the [atom-languageclient implementation list](https://github.com/atom-community/atom-languageclient#capabilities) and the [deno implementation list](https://github.com/denoland/deno/issues/8643#issue-758171107) are available.
 
 
 ## settings
