@@ -1,4 +1,4 @@
-## 1.0.0
+## 1.1.0
  - supports Import Completions
 
 ## 1.0.0
