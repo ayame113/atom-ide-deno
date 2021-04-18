@@ -1,6 +1,7 @@
 ## 1.2.0
  - supports "Go to Definition"
 ![using go to definition](/screenshot/goToDefinition.gif "using go to definition")
+ - add hosts that support import completion to the default settings
  - Preparing commands for custom request
    - For developers: You can try a custom request by opening a console with `ctrl-shift-i` and typing the following command:
 
