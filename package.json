@@ -121,7 +121,9 @@
 									"description": "Controls which hosts are enabled for import suggestions. See [vscode's document](https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md)",
 									"type": "array",
 									"default": [
-										"https://deno.land/"
+										"https://deno.land/",
+										"https://x.nest.land/",
+										"https://envoy.now.sh/"
 									],
 									"order": 17,
 									"items": {
