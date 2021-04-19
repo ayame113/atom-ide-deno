@@ -19,7 +19,7 @@ This is a package produced by the community (not the deno team).
 
 > ⚠️ The `atom-ide-javascript` package is for Node.js. It has nothing to do with this extension.
 
-Please see [here](https://atom-community.github.io/) for atom-IDE.
+Please see [here](https://atom-community.io/) for atom-IDE.
 
 ## Installation
 

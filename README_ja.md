@@ -18,7 +18,7 @@ deno language serverによる、Atom-IDEのdenoサポート
 
 > ⚠️ atom-ide-javascriptパッケージはNode.js用です。この拡張機能とは関連がありません。
 
-atom-IDEについては[こちら](https://atom-community.github.io/)を参照。
+atom-IDEについては[こちら](https://atom-community.io/)を参照。
 
 
 ## インストール
