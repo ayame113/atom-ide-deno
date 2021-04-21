@@ -1,1 +1,1 @@
-{"version":3,"file":"main.js","sources":["../src/main.ts"],"sourcesContent":["function f(a: number): void {\n\tconsole.log(a);\n}\nf(1)\n"],"names":["a","console","log"],"mappings":"aAAA,IAAWA,EAAAA,EAGT,EAFDC,QAAQC,IAAIF"}
+{"version":3,"file":"main.js","sources":["../src/main.ts"],"sourcesContent":["function f(a: number): void {\n\tconsole.log(a);\n}\nf(2)\n"],"names":["a","console","log"],"mappings":"aAAA,IAAWA,EAAAA,EAGT,EAFDC,QAAQC,IAAIF"}
