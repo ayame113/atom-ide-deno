@@ -164,6 +164,11 @@
 			"versions": {
 				"0.1.0": "consumeBusySignal"
 			}
+		},
+		"signature-help": {
+			"versions": {
+				"0.1.0": "consumeSignatureHelp"
+			}
 		}
 	},
 	"providedServices": {
