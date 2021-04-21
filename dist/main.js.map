@@ -1,1 +1,1 @@
-{"version":3,"file":"main.js","sources":["../src/main.ts"],"sourcesContent":["function f(a: string): void {\n\tconsole.log(a);\n}\nf('ci test pull request')\n"],"names":["a","console","log"],"mappings":"aAAA,IAAWA,EAAAA,EAGT,uBAFDC,QAAQC,IAAIF"}
+{"version":3,"file":"main.js","sources":["../src/main.ts"],"sourcesContent":["function f(a: string): void {\n\tconsole.log(a);\n}\nf('ci test pull request 3')\n"],"names":["a","console","log"],"mappings":"aAAA,IAAWA,EAAAA,EAGT,yBAFDC,QAAQC,IAAIF"}
