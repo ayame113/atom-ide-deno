@@ -61,7 +61,7 @@ jobs:
   #      run: pnpm test.lint
 
   #Release:
-  auto TypeScript transpile:
+  auto-TypeScript-transpile:
     #needs: [Test, Lint]
     #if: github.ref == 'refs/heads/main' &&
     #  github.event.repository.fork == false
