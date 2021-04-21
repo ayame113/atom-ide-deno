@@ -63,6 +63,28 @@ jobs:
   #Release:
   auto-TypeScript-transpile:
     #needs: [Test, Lint]
+    #if: github.ref == 'refs/heads/main' &&
+    #  github.event.repository.fork == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      #- uses: atom-community/action-setup-atom@v1
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "12.x"
+      - name: gitsetting
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+      - name: NPM install
+        run: npm install
+      - name: Build and Commit
+        run: npm run build-commit
+
+
+  #Release:
+  auto-TypeScript-transpile-merge:
+    needs: auto-TypeScript-transpile
     if: github.ref == 'refs/heads/main' &&
       github.event.repository.fork == false
     runs-on: ubuntu-latest
@@ -85,15 +107,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
-      # NOTE: uncomment when ready
-      # - name: Release 🎉
-      #   uses: cycjimmy/semantic-release-action@v2
-      #   with:
-      #     extends: |
-      #       @semantic-release/apm-config
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #     ATOM_ACCESS_TOKEN: ${{ secrets.ATOM_ACCESS_TOKEN  }}
 
   #Skip:
   #  if: contains(github.event.head_commit.message, '[skip ci]')
