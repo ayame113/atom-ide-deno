@@ -42,9 +42,9 @@ jobs:
           fetch-depth: 0
 
       #- if: "!contains(github.event.head_commit.message, 'Prepare')"
-      - if: true
-        name: Commit lint ✨
-        uses: wagoid/commitlint-github-action@v2
+      #- if: true
+      #  name: Commit lint ✨
+      #  uses: wagoid/commitlint-github-action@v2
 
       - uses: atom-community/action-setup-atom@v1
       - name: Setup PNPM
