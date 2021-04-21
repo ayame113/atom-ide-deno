@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: atom-community/action-setup-atom@v1
+      #- uses: atom-community/action-setup-atom@v1
       - uses: actions/setup-node@v2
         with:
           node-version: "12.x"
