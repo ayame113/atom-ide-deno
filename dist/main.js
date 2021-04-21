@@ -1,2 +1,2 @@
-"use strict";var e;e="ci test pull request 3",console.log(e);
+"use strict";var t;t="ci test test",console.log(t);
 //# sourceMappingURL=main.js.map
