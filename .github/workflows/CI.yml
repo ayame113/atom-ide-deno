@@ -60,7 +60,8 @@ jobs:
   #    - name: Lint ✨
   #      run: pnpm test.lint
 
-  Release:
+  #Release:
+  auto TypeScript transpile:
     #needs: [Test, Lint]
     #if: github.ref == 'refs/heads/main' &&
     #  github.event.repository.fork == false
@@ -79,6 +80,11 @@ jobs:
         run: npm install
       - name: Build and Commit
         run: npm run build-commit
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
       # NOTE: uncomment when ready
       # - name: Release 🎉
       #   uses: cycjimmy/semantic-release-action@v2
