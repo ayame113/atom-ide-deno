@@ -1,4 +1,4 @@
 function f(a: string): void {
 	console.log(a);
 }
-f('ci test')
+f('ci test pull request')
