@@ -63,8 +63,8 @@ jobs:
   #Release:
   auto-TypeScript-transpile:
     #needs: [Test, Lint]
-    #if: github.ref == 'refs/heads/main' &&
-    #  github.event.repository.fork == false
+    if: github.ref == 'refs/heads/main' &&
+      github.event.repository.fork == false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
