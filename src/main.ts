@@ -1,4 +1,4 @@
-function f(a: number): void {
+function f(a: string): void {
 	console.log(a);
 }
-f(1)
+f('ci test')
