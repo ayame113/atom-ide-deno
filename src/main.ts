@@ -9,7 +9,7 @@ import cp from 'child_process'
 const getDenoPath = ()=>atom.config.get('atom-ide-deno.path')||'deno'
 
 let isDebug = false
-:::
+
 class DenoLanguageClient extends AutoLanguageClient {
 	_emptyConnection!: LanguageClientConnection
 	//isDebug=true時に再起動
