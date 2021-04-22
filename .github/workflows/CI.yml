@@ -85,6 +85,8 @@ jobs:
           git config --local user.name "GitHub Action"
       - name: NPM install
         run: npm install
+      - name: currentcommit
+        run: git log -n 1
       - name: Build and Commit
         run: npm run build-commit
       - name: Push changes
