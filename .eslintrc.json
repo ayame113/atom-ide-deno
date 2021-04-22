@@ -1,4 +1,21 @@
 {
-  "extends": "eslint-config-atomic",
-  "ignorePatterns": ["dist/", "node_modules/"]
+	"extends": [
+		"eslint-config-atomic",
+		"eslint:recommended",
+		"plugin:@typescript-eslint/recommended-requiring-type-checking"
+	],
+	"plugins": [
+		"@typescript-eslint"
+	],
+	"parser": "@typescript-eslint/parser",
+	"parserOptions": {
+		"sourceType": "module",
+		"project": "./src/tsconfig.json"
+	},
+	"ignorePatterns": [
+		"dist/",
+		"lib/",
+		"/rollup.config.js",
+		"*.json"
+	]
 }
