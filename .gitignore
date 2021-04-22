@@ -2,6 +2,3 @@
 npm-debug.log
 node_modules
 dist
-.prettierignore
-.prettierrc.json
-.eslintrc.json
