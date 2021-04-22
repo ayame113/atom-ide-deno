@@ -46,8 +46,8 @@ jobs:
       #  name: Commit lint ✨
       #  uses: wagoid/commitlint-github-action@v2
 
-       - name: node ver
-         run: node --version
+      - name: node ver
+        run: node --version
 
       - uses: atom-community/action-setup-atom@v1
       - name: Setup PNPM
