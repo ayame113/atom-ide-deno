@@ -8,7 +8,7 @@ import cp from 'child_process'
 
 const getDenoPath = ()=>atom.config.get('atom-ide-deno.path')||'deno'
 
-let isDebug = false
+let isDebug: string = false
 
 class DenoLanguageClient extends AutoLanguageClient {
 	_emptyConnection!: LanguageClientConnection
