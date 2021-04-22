@@ -61,6 +61,9 @@ jobs:
       #- name: Format ✨
       #  run: pnpm test.format
 
+      - name: TypeCheck ✨
+        run: pnpm check
+
       - name: Lint ✨
         run: pnpm test.lint
 
