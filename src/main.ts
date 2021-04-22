@@ -3,3 +3,4 @@ function f(a: string): void {
 }
 f("ci test test");
 :::::::::::
+............
