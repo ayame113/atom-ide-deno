@@ -50,22 +50,22 @@ jobs:
         run: node --version
 
       - uses: atom-community/action-setup-atom@v1
-      - name: Setup PNPM
-        uses: pnpm/action-setup@master
-        with:
-          version: latest
+      #- name: Setup PNPM
+      #  uses: pnpm/action-setup@master
+      #  with:
+      #    version: latest
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       #- name: Format ✨
       #  run: pnpm test.format
 
       - name: TypeCheck ✨
-        run: pnpm check
+        run: npm check
 
       - name: Lint ✨
-        run: pnpm test.lint
+        run: npm test.lint
 
   #Release:
   auto-TypeScript-transpile-merge:
