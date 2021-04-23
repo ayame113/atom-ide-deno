@@ -8,7 +8,6 @@ import cp from 'child_process'
 
 const getDenoPath = () => atom.config.get('atom-ide-deno.path') || 'deno'
 
-
 let isDebug = false
 
 class DenoLanguageClient extends AutoLanguageClient {
@@ -47,15 +46,18 @@ class DenoLanguageClient extends AutoLanguageClient {
 		//suggest.imports.hosts の入力はArrayだが、渡すときにObjectに変換する必要がある
 		//https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md
 		try {
-			initializationOptions.suggest.imports.hosts = Object.fromEntries(initializationOptions.suggest.imports.hosts.map((v: string) => [v, true]))
-		} catch(e) {console.log(e)}
-		if (this.isDebug) {console.log(initializationOptions)}
+			initializationOptions.suggest.imports.hosts = Object.fromEntries(
+				initializationOptions.suggest.imports.hosts.map((v: string) => [v, true])
+			)
+		} catch (e) {
+			console.log(e)
+		}
+		if (this.isDebug) {
+			console.log(initializationOptions)
+		}
 		//https://github.com/denoland/deno/pull/8850
 		//enableフラグが必要
-		return Object.assign(
-			super.getInitializeParams(...args),
-			{initializationOptions}
-		)
+		return Object.assign(super.getInitializeParams(...args), {initializationOptions})
 	}
 	restartAllServers(...args: []) {
 		console.log('restart Deno Language server')
@@ -127,14 +129,10 @@ class DenoLanguageClient extends AutoLanguageClient {
 	}
 	//custom request
 	provideDenoCache(textEditor: TextEditor) {
-		return this.sendCustomRequestForCurrentEditor(
-			'deno/cache', {
-				referrer: Convert.editorToTextDocumentIdentifier(
-					textEditor||atom.workspace.getActiveTextEditor()
-				),
-				uris: []
-			}
-		)
+		return this.sendCustomRequestForCurrentEditor('deno/cache', {
+			referrer: Convert.editorToTextDocumentIdentifier(textEditor || atom.workspace.getActiveTextEditor()),
+			uris: []
+		})
 	}
 	provideDenoPerformance() {
 		return this.sendCustomRequestForAnyEditor('deno/performance')
@@ -195,7 +193,7 @@ atom.workspace.addOpener(filePath => {
 	//言語モードを設定
 	atom.grammars.assignLanguageMode(
 		editor.getBuffer(),
-		atom.grammars.selectGrammar(filePath, ''/*sourceText*/).scopeName
+		atom.grammars.selectGrammar(filePath, '' /*sourceText*/).scopeName
 	)
 	// デフォルトの表示
 	editor.setText('// please wait...\n')
@@ -221,7 +219,7 @@ atom.workspace.addOpener(filePath => {
 		originalFunctions[funcName] = editor[funcName]
 		editor[funcName] = (...args: any[]) => calledArgs[funcName]?.push(args)
 	}
-	(async _ => {
+	;(async _ => {
 		const doc = await denoLS.provideDenoVirtualTextDocument({
 			uri: filePath.replace('deno://', 'deno:/')
 		})
