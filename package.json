@@ -24,10 +24,10 @@
 		"test": "atom --test spec"
 	},
 	"dependencies": {
-		"atom-languageclient": "^1.8.0"
+		"atom-languageclient": "^1.8.0",
+		"atom-ts-transpiler": "^1.5.3"
 	},
 	"devDependencies": {
-		"atom-ts-transpiler": "^1.5.3",
 		"vscode-languageserver-protocol": "^3.16.0",
 		"@types/atom": "1.40.10",
 		"@types/node": "^14.14.37",
