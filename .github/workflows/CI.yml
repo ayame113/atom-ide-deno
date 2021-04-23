@@ -19,10 +19,10 @@ jobs:
       - uses: atom-community/action-setup-atom@v1
 
       - name: Install dependencies
-        run: apm install
+        run: npm install
 
       - name: Format ✨
-        run: pnpm test.format
+        run: npm test.format
 
       - name: TypeCheck ✨
         run: npm run check
