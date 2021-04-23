@@ -5,7 +5,6 @@ on:
 
 jobs:
   Lint:
-    #if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -14,7 +13,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: node ver
+      - name: Node version
         run: node --version
 
       - uses: atom-community/action-setup-atom@v1
