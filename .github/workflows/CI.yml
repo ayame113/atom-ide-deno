@@ -24,6 +24,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: prettiertest
+        run: |
+          npm install -g prettier
+          prettier . --check
+
       - name: Format ✨
         run: npm run test.format
 
