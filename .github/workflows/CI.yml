@@ -21,8 +21,8 @@ jobs:
       - name: Install dependencies
         run: apm install
 
-      #- name: Format ✨
-      #  run: pnpm test.format
+      - name: Format ✨
+        run: pnpm test.format
 
       - name: TypeCheck ✨
         run: npm run check
