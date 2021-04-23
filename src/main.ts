@@ -1,9 +1,9 @@
 import {AutoLanguageClient, Convert} from 'atom-languageclient'
 import type {LanguageServerProcess, LanguageClientConnection, ActiveServer} from 'atom-languageclient'
 import type {ServerManager} from 'atom-languageclient/lib/server-manager'
-import type {Point} from "atom"
-import {TextEditor} from "atom"
-import type {TextDocumentIdentifier} from "vscode-languageserver-protocol";
+import type {Point} from 'atom'
+import {TextEditor} from 'atom'
+import type {TextDocumentIdentifier} from 'vscode-languageserver-protocol';
 import cp from 'child_process'
 
 const getDenoPath = ()=>atom.config.get('atom-ide-deno.path')||'deno'
@@ -28,7 +28,7 @@ class DenoLanguageClient extends AutoLanguageClient {
 			'JavaScript',
 			'TypeScript',
 			//'source.gfm', <-not supported at deno lsp
-			'source.json',
+			'source.json'
 		]
 	}
 	getLanguageName () { return 'JavaScript' }
@@ -85,40 +85,7 @@ class DenoLanguageClient extends AutoLanguageClient {
 	}
 	startServerProcess(_projectPath: string) {
 		console.log('Starting deno language server')
-		//if (!this.isDebug) {
-			return cp.spawn(getDenoPath(), ['lsp'], {env: process.env})
-		//} else {
-			/*const formatData = data=>data.toString().split('\n').map(v=>{
-				try {return JSON.parse(v)}
-				catch (_) {return v}
-			})
-			const env = process.env
-			console.log(env)
-			const childProcess = cp.spawn(getDenoPath(), ['lsp'], {
-				env: env
-			})
-			const originalWriter = childProcess.stdin.write
-			childProcess.stdin.write = function (...args) {
-				console.log('[stdin]', ...args.flatMap(formatData))
-				originalWriter.apply(childProcess.stdin, args)
-			}
-			childProcess.stdout.on('data', (data) => {
-				console.log('[stdout]', ...formatData(data))
-			})
-			childProcess.stderr.on('data', (data) => {
-				console.log('[stderr]', ...formatData(data))
-			})
-			childProcess.on('close', exitCode => {
-				if (!childProcess.killed) {
-					atom.notifications.addError('Deno language server stopped unexpectedly.', {
-						dismissable: true,
-						description: this.processStdErr ? `<code>${this.processStdErr}</code>` : `Exit code ${exitCode}`
-					})
-				}
-				console.log(this.processStdErr)
-			})
-			return childProcess*/
-		//}
+		return cp.spawn(getDenoPath(), ['lsp'], {env: process.env})
 	}
 	//custom request util
 	getCurrentConnection(): Promise<LanguageClientConnection | null> {
@@ -195,7 +162,7 @@ const denoLS = new DenoLanguageClient()
 //config変更時にlspを再起動
 //importMap pathの入力途中でfile not foundエラーが出るため、2秒間間引く
 let inputTimeoutId: NodeJS.Timeout
-atom.config.onDidChange('atom-ide-deno', _=>{
+atom.config.onDidChange('atom-ide-deno', ()=>{
 	console.log('atom-ide-deno config change caught')
 	clearTimeout(inputTimeoutId)
 	inputTimeoutId = setTimeout(_=>{
