@@ -4,5 +4,6 @@
 	"semi": false,
 	"endOfLine": "crlf",
 	"bracketSpacing": false,
-	"arrowParens": "avoid"
+	"arrowParens": "avoid",
+	"trailingComma": "none"
 }
