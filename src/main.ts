@@ -1,25 +1,26 @@
 import {AutoLanguageClient, Convert} from 'atom-languageclient'
 import type {LanguageServerProcess, LanguageClientConnection, ActiveServer} from 'atom-languageclient'
 import type {ServerManager} from 'atom-languageclient/lib/server-manager'
-import type {Point} from "atom"
-import {TextEditor} from "atom"
-import type {TextDocumentIdentifier} from "vscode-languageserver-protocol";
+import type {Point} from 'atom'
+import {TextEditor} from 'atom'
+import type {TextDocumentIdentifier} from 'vscode-languageserver-protocol'
 import cp from 'child_process'
 
-const getDenoPath = ()=>atom.config.get('atom-ide-deno.path')||'deno'
-
+const getDenoPath = () => atom.config.get('atom-ide-deno.path') || 'deno'
 
 let isDebug = false
 
 class DenoLanguageClient extends AutoLanguageClient {
 	_emptyConnection!: LanguageClientConnection
 	//isDebug=true時に再起動
-	get isDebug() {return isDebug}
+	get isDebug() {
+		return isDebug
+	}
 	set isDebug(v) {
 		isDebug = v
 		this.restartAllServers()
 	}
-	getGrammarScopes () {
+	getGrammarScopes() {
 		return [
 			'source.js',
 			'source.jsx',
@@ -28,28 +29,35 @@ class DenoLanguageClient extends AutoLanguageClient {
 			'JavaScript',
 			'TypeScript',
 			//'source.gfm', <-not supported at deno lsp
-			'source.json',
+			'source.json'
 		]
 	}
-	getLanguageName () { return 'JavaScript' }
-	getServerName () { return 'deno-language-server' }
+	getLanguageName() {
+		return 'JavaScript'
+	}
+	getServerName() {
+		return 'deno-language-server'
+	}
 	getInitializeParams(...args: [string, LanguageServerProcess]) {
 		const initializationOptions = atom.config.get('atom-ide-deno.lspFlags')
 		//filter empty string
-		initializationOptions.importMap = initializationOptions.importMap||void 0
-		initializationOptions.config = initializationOptions.config||void 0
+		initializationOptions.importMap = initializationOptions.importMap || void 0
+		initializationOptions.config = initializationOptions.config || void 0
 		//suggest.imports.hosts の入力はArrayだが、渡すときにObjectに変換する必要がある
 		//https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md
 		try {
-			initializationOptions.suggest.imports.hosts = Object.fromEntries(initializationOptions.suggest.imports.hosts.map((v: string)=>[v, true]))
-		} catch(e) {console.log(e)}
-		if (this.isDebug) {console.log(initializationOptions)}
+			initializationOptions.suggest.imports.hosts = Object.fromEntries(
+				initializationOptions.suggest.imports.hosts.map((v: string) => [v, true])
+			)
+		} catch (e) {
+			console.log(e)
+		}
+		if (this.isDebug) {
+			console.log(initializationOptions)
+		}
 		//https://github.com/denoland/deno/pull/8850
 		//enableフラグが必要
-		return Object.assign(
-			super.getInitializeParams(...args),
-			{initializationOptions}
-		)
+		return Object.assign(super.getInitializeParams(...args), {initializationOptions})
 	}
 	restartAllServers(...args: []) {
 		console.log('restart Deno Language server')
@@ -67,15 +75,20 @@ class DenoLanguageClient extends AutoLanguageClient {
 	}*/
 	async getDefinition(...args: [TextEditor, Point]) {
 		const res = await super.getDefinition(...args)
+		// prettier-ignore
 		if (this.isDebug) {console.log(res)}
+		// prettier-ignore
 		if (res==null) {return null}
 		const {definitions, ...others} = res
 		// `deno:/` から始まるカスタムリクエストは相対パスとして解釈されてしまう
 		// `deno://` に置換して返す
 		return {
-			definitions: definitions.map(d=>{
+			definitions: definitions.map(d => {
+				// prettier-ignore
 				if (!d.path) {return d}
+				// prettier-ignore
 				if (typeof d.path!='string') {return d}
+				// prettier-ignore
 				if (!d.path.startsWith('deno:/') || d.path.startsWith('deno://')) {return d}
 				d.path = d.path.replace('deno:/', 'deno://')
 				return d
@@ -85,40 +98,7 @@ class DenoLanguageClient extends AutoLanguageClient {
 	}
 	startServerProcess(_projectPath: string) {
 		console.log('Starting deno language server')
-		//if (!this.isDebug) {
-			return cp.spawn(getDenoPath(), ['lsp'], {env: process.env})
-		//} else {
-			/*const formatData = data=>data.toString().split('\n').map(v=>{
-				try {return JSON.parse(v)}
-				catch (_) {return v}
-			})
-			const env = process.env
-			console.log(env)
-			const childProcess = cp.spawn(getDenoPath(), ['lsp'], {
-				env: env
-			})
-			const originalWriter = childProcess.stdin.write
-			childProcess.stdin.write = function (...args) {
-				console.log('[stdin]', ...args.flatMap(formatData))
-				originalWriter.apply(childProcess.stdin, args)
-			}
-			childProcess.stdout.on('data', (data) => {
-				console.log('[stdout]', ...formatData(data))
-			})
-			childProcess.stderr.on('data', (data) => {
-				console.log('[stderr]', ...formatData(data))
-			})
-			childProcess.on('close', exitCode => {
-				if (!childProcess.killed) {
-					atom.notifications.addError('Deno language server stopped unexpectedly.', {
-						dismissable: true,
-						description: this.processStdErr ? `<code>${this.processStdErr}</code>` : `Exit code ${exitCode}`
-					})
-				}
-				console.log(this.processStdErr)
-			})
-			return childProcess*/
-		//}
+		return cp.spawn(getDenoPath(), ['lsp'], {env: process.env})
 	}
 	//custom request util
 	getCurrentConnection(): Promise<LanguageClientConnection | null> {
@@ -149,14 +129,10 @@ class DenoLanguageClient extends AutoLanguageClient {
 	}
 	//custom request
 	provideDenoCache(textEditor: TextEditor) {
-		return this.sendCustomRequestForCurrentEditor(
-			'deno/cache', {
-				referrer: Convert.editorToTextDocumentIdentifier(
-					textEditor||atom.workspace.getActiveTextEditor()
-				),
-				uris: []
-			}
-		)
+		return this.sendCustomRequestForCurrentEditor('deno/cache', {
+			referrer: Convert.editorToTextDocumentIdentifier(textEditor || atom.workspace.getActiveTextEditor()),
+			uris: []
+		})
 	}
 	provideDenoPerformance() {
 		return this.sendCustomRequestForAnyEditor('deno/performance')
@@ -172,10 +148,11 @@ class DenoLanguageClient extends AutoLanguageClient {
 	//custom request extends
 	provideDenoCacheAll() {
 		const grammarScopes = this.getGrammarScopes()
+		// prettier-ignore
 		return Promise.all(
 			atom.workspace.getTextEditors()
-			.filter(editor=>grammarScopes.includes(editor.getGrammar().scopeName))
-			.map(editor=>this.provideDenoCache(editor))
+			.filter(editor => grammarScopes.includes(editor.getGrammar().scopeName))
+			.map(editor => this.provideDenoCache(editor))
 		)
 	}
 	provideDenoStatusDocument() {
@@ -195,10 +172,10 @@ const denoLS = new DenoLanguageClient()
 //config変更時にlspを再起動
 //importMap pathの入力途中でfile not foundエラーが出るため、2秒間間引く
 let inputTimeoutId: NodeJS.Timeout
-atom.config.onDidChange('atom-ide-deno', _=>{
+atom.config.onDidChange('atom-ide-deno', () => {
 	console.log('atom-ide-deno config change caught')
 	clearTimeout(inputTimeoutId)
-	inputTimeoutId = setTimeout(_=>{
+	inputTimeoutId = setTimeout(_ => {
 		denoLS.restartAllServers()
 	}, 2000)
 })
@@ -207,7 +184,7 @@ export default denoLS
 /*
 virtual documentを表示
 */
-atom.workspace.addOpener(filePath=>{
+atom.workspace.addOpener(filePath => {
 	if (!filePath.startsWith('deno://')) {
 		return
 	}
@@ -216,21 +193,21 @@ atom.workspace.addOpener(filePath=>{
 	//言語モードを設定
 	atom.grammars.assignLanguageMode(
 		editor.getBuffer(),
-		atom.grammars.selectGrammar(filePath, ''/*sourceText*/).scopeName
+		atom.grammars.selectGrammar(filePath, '' /*sourceText*/).scopeName
 	)
 	// デフォルトの表示
 	editor.setText('// please wait...\n')
 	//読み取り専用
 	editor.setReadOnly(true)
 	//タブ名
-	editor.getTitle = ()=>filePath
-	editor.getLongTitle = ()=>filePath
+	editor.getTitle = () => filePath
+	editor.getLongTitle = () => filePath
 	//保存を無効にする
 	// @ts-ignore
-	editor.shouldPromptToSave = ()=>false
+	editor.shouldPromptToSave = () => false
 	//閉じるボタンの表示を調整
-	editor.isModified = ()=>false
-	editor.getBuffer().isModified = ()=>false
+	editor.isModified = () => false
+	editor.getBuffer().isModified = () => false
 	// defer execution until the content display is complete
 	// notice: return value is ignored
 	type trapFunctionName = 'setCursorBufferPosition' | 'scrollToBufferPosition'
@@ -240,9 +217,9 @@ atom.workspace.addOpener(filePath=>{
 	for (const funcName of trapFunctions) {
 		calledArgs[funcName] = []
 		originalFunctions[funcName] = editor[funcName]
-		editor[funcName] = (...args: any[])=>calledArgs[funcName]?.push(args)
+		editor[funcName] = (...args: any[]) => calledArgs[funcName]?.push(args)
 	}
-	(async _=>{
+	;(async _ => {
 		const doc = await denoLS.provideDenoVirtualTextDocument({
 			uri: filePath.replace('deno://', 'deno:/')
 		})
@@ -256,7 +233,7 @@ atom.workspace.addOpener(filePath=>{
 				// @ts-ignore
 				editor[funcName] = originalFunctions[funcName]
 				// @ts-ignore
-				calledArgs[funcName].forEach(args=>editor[funcName](...args))
+				calledArgs[funcName].forEach(args => editor[funcName](...args))
 			}
 		}
 	})()

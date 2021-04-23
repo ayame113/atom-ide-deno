@@ -13,16 +13,16 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Node version
-        run: node --version
+      #- name: Node version
+      #  run: node --version
 
-      - uses: atom-community/action-setup-atom@v1
+      #- uses: atom-community/action-setup-atom@v1
 
       - name: Install dependencies
-        run: apm install
+        run: npm install
 
-      #- name: Format ✨
-      #  run: pnpm test.format
+      - name: Format ✨
+        run: npm run test.format
 
       - name: TypeCheck ✨
         run: npm run check
