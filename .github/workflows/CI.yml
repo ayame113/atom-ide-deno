@@ -17,7 +17,7 @@ jobs:
       #  run: node --version
 
       - name: ll
-        run: ll
+        run: ls -al
 
       #- uses: atom-community/action-setup-atom@v1
 
