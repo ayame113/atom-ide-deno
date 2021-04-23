@@ -28,7 +28,7 @@ jobs:
         run: npm install
 
       - name: prettiertest
-        run: npx prettier --check --list-different .
+        run: npx prettier --list-different .
 
       - name: Format ✨
         run: npm run test.format
