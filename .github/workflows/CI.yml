@@ -16,19 +16,10 @@ jobs:
       #- name: Node version
       #  run: node --version
 
-      - name: ll
-        run: ls -al
-
-      - name: branch
-        run: git branch
-
       #- uses: atom-community/action-setup-atom@v1
 
       - name: Install dependencies
         run: npm install
-
-      - name: prettiertest
-        run: npx prettier --check --config ./.prettierrc .
 
       - name: Format ✨
         run: npm run test.format
