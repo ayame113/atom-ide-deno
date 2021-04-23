@@ -3,10 +3,10 @@ import type {LanguageServerProcess, LanguageClientConnection, ActiveServer} from
 import type {ServerManager} from 'atom-languageclient/lib/server-manager'
 import type {Point} from 'atom'
 import {TextEditor} from 'atom'
-import type {TextDocumentIdentifier} from 'vscode-languageserver-protocol';
+import type {TextDocumentIdentifier} from 'vscode-languageserver-protocol'
 import cp from 'child_process'
 
-const getDenoPath = () => atom.config.get('atom-ide-deno.path')||'deno'
+const getDenoPath = () => atom.config.get('atom-ide-deno.path') || 'deno'
 
 
 let isDebug = false
@@ -14,12 +14,14 @@ let isDebug = false
 class DenoLanguageClient extends AutoLanguageClient {
 	_emptyConnection!: LanguageClientConnection
 	//isDebug=true時に再起動
-	get isDebug() {return isDebug}
+	get isDebug() {
+		return isDebug
+	}
 	set isDebug(v) {
 		isDebug = v
 		this.restartAllServers()
 	}
-	getGrammarScopes () {
+	getGrammarScopes() {
 		return [
 			'source.js',
 			'source.jsx',
@@ -31,13 +33,17 @@ class DenoLanguageClient extends AutoLanguageClient {
 			'source.json'
 		]
 	}
-	getLanguageName () { return 'JavaScript' }
-	getServerName () { return 'deno-language-server' }
+	getLanguageName() {
+		return 'JavaScript'
+	}
+	getServerName() {
+		return 'deno-language-server'
+	}
 	getInitializeParams(...args: [string, LanguageServerProcess]) {
 		const initializationOptions = atom.config.get('atom-ide-deno.lspFlags')
 		//filter empty string
-		initializationOptions.importMap = initializationOptions.importMap||void 0
-		initializationOptions.config = initializationOptions.config||void 0
+		initializationOptions.importMap = initializationOptions.importMap || void 0
+		initializationOptions.config = initializationOptions.config || void 0
 		//suggest.imports.hosts の入力はArrayだが、渡すときにObjectに変換する必要がある
 		//https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md
 		try {
@@ -67,15 +73,20 @@ class DenoLanguageClient extends AutoLanguageClient {
 	}*/
 	async getDefinition(...args: [TextEditor, Point]) {
 		const res = await super.getDefinition(...args)
+		// prettier-ignore
 		if (this.isDebug) {console.log(res)}
+		// prettier-ignore
 		if (res==null) {return null}
 		const {definitions, ...others} = res
 		// `deno:/` から始まるカスタムリクエストは相対パスとして解釈されてしまう
 		// `deno://` に置換して返す
 		return {
 			definitions: definitions.map(d => {
+				// prettier-ignore
 				if (!d.path) {return d}
+				// prettier-ignore
 				if (typeof d.path!='string') {return d}
+				// prettier-ignore
 				if (!d.path.startsWith('deno:/') || d.path.startsWith('deno://')) {return d}
 				d.path = d.path.replace('deno:/', 'deno://')
 				return d
@@ -139,6 +150,7 @@ class DenoLanguageClient extends AutoLanguageClient {
 	//custom request extends
 	provideDenoCacheAll() {
 		const grammarScopes = this.getGrammarScopes()
+		// prettier-ignore
 		return Promise.all(
 			atom.workspace.getTextEditors()
 			.filter(editor => grammarScopes.includes(editor.getGrammar().scopeName))
