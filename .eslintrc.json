@@ -13,9 +13,6 @@
 		"project": "./src/tsconfig.json"
 	},
 	"ignorePatterns": [
-		"dist/",
-		"lib/",
-		"/rollup.config.js",
 		"*.json"
 	]
 }
