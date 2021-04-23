@@ -23,6 +23,16 @@
 		"test.lint": "eslint .",
 		"test": "atom --test spec"
 	},
+	"prettier": {
+		"useTabs": true,
+		"singleQuote": true,
+		"semi": false,
+		"endOfLine": "crlf",
+		"bracketSpacing": false,
+		"arrowParens": "avoid",
+		"trailingComma": "none",
+		"printWidth": 120
+	},
 	"dependencies": {
 		"atom-languageclient": "^1.8.0"
 	},
