@@ -1,10 +1,26 @@
+## 1.3.0
+ - supports json file
+ - supports ignature help provider
+ - use typescript in this package's code
+ - supports command pallet (`ctrl+shift+p`)
+   - Cache Dependencies
+   - Reload Import Registries Cache
+   - Restart Language Server
+   - Language Server Status
+     ![command pallet](./screenshot/command_pallet.gif)
+ - add menus (`menu bar > Packages > Deno`)
+   - same support as command
+     ![menu bar](./screenshot/menu_bar.jpg)
+
+
 ## 1.2.0
  - supports "Go to Definition"
-![using go to definition](/screenshot/goToDefinition.gif "using go to definition")
+![using go to definition](./screenshot/go_to_definition.gif "using go to definition")
  - add hosts that support import completion to the default settings
  - Preparing commands for custom request
-   - For developers: You can try a custom request by opening a console with `ctrl-shift-i` and typing the following command:
-
+   - ~~For developers: You can try a custom request by opening a console with `ctrl-shift-i` and typing the following command:~~
+   <details>
+<summary>this is not work in current version</summary>
 ```js
 await atom.packages.activePackages["atom-ide-deno"].mainModule.provideDenoCache()
 await atom.packages.activePackages["atom-ide-deno"].mainModule.provideDenoCacheAll()
@@ -13,6 +29,7 @@ await atom.packages.activePackages["atom-ide-deno"].mainModule.provideDenoReload
 await atom.packages.activePackages["atom-ide-deno"].mainModule.showDenoStatusDocument()
 await atom.packages.activePackages["atom-ide-deno"].mainModule.provideDenoVirtualTextDocument({uri: 'deno:/status.md'})
 ```
+</details>
 
 ## 1.1.0
  - supports Import Completions
