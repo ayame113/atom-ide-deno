@@ -8,7 +8,7 @@
 	"parser": "@typescript-eslint/parser",
 	"parserOptions": {
 		"sourceType": "module",
-		"project": "./src/tsconfig.json"
+		"project": "./lib/tsconfig.json"
 	},
 	"ignorePatterns": ["*.json"]
 }

@@ -1,3 +1,5 @@
+import {menu} from '../menus/main.json'
+
 import {AutoLanguageClient, Convert, FilteredLogger} from 'atom-languageclient'
 import type {LanguageServerProcess, LanguageClientConnection, ActiveServer} from 'atom-languageclient'
 import type {ServerManager} from 'atom-languageclient/lib/server-manager'
@@ -58,6 +60,10 @@ class DenoLanguageClient extends AutoLanguageClient {
 		//https://github.com/denoland/deno/pull/8850
 		//enableフラグが必要
 		return Object.assign(super.getInitializeParams(...args), {initializationOptions})
+	}
+	activate() {
+		super.activate()
+		onActivate(this)
 	}
 	restartAllServers(...args: []) {
 		console.log('restart Deno Language server')
@@ -125,117 +131,142 @@ class DenoLanguageClient extends AutoLanguageClient {
 		return (await this.getAnyConnection()).sendCustomRequest(method, params)
 	}
 	//custom request
-	provideDenoCache(textEditor: TextEditor) {
+	getDenoCache(textEditor?: TextEditor) {
+		const editor = textEditor || atom.workspace.getActiveTextEditor()
+		if (!editor) {
+			return
+		}
 		return this.sendCustomRequestForCurrentEditor('deno/cache', {
-			referrer: Convert.editorToTextDocumentIdentifier(textEditor || atom.workspace.getActiveTextEditor()),
+			referrer: Convert.editorToTextDocumentIdentifier(editor),
 			uris: []
 		})
 	}
-	provideDenoPerformance() {
+	getDenoPerformance() {
 		return this.sendCustomRequestForAnyEditor('deno/performance')
 	}
-	provideDenoReloadImportRegistries() {
+	getDenoReloadImportRegistries() {
 		return this.sendCustomRequestForAnyEditor('deno/reloadImportRegistries')
 	}
-	provideDenoVirtualTextDocument(textDocumentIdentifier: TextDocumentIdentifier) {
+	getDenoVirtualTextDocument(textDocumentIdentifier: TextDocumentIdentifier) {
 		return this.sendCustomRequestForAnyEditor('deno/virtualTextDocument', {
 			textDocument: textDocumentIdentifier
 		})
 	}
 	//custom request extends
-	provideDenoCacheAll() {
+	getDenoCacheAll() {
 		const grammarScopes = this.getGrammarScopes()
 		// prettier-ignore
 		return Promise.all(
 			atom.workspace.getTextEditors()
 			.filter(editor => grammarScopes.includes(editor.getGrammar().scopeName))
-			.map(editor => this.provideDenoCache(editor))
+			.map(editor => this.getDenoCache(editor))
 		)
 	}
-	provideDenoStatusDocument() {
-		return this.provideDenoVirtualTextDocument({uri: 'deno:/status.md'})
+	getDenoStatusDocument() {
+		return this.getDenoVirtualTextDocument({uri: 'deno:/status.md'})
 	}
 	async showDenoStatusDocument() {
 		return atom.notifications.addInfo('Deno Language Server', {
-			description: await this.provideDenoStatusDocument(),
+			description: await this.getDenoStatusDocument(),
 			dismissable: true,
 			icon: 'deno'
 		})
 	}
 }
 
-const denoLS = new DenoLanguageClient()
+export default new DenoLanguageClient()
+function onActivate(denoLS: DenoLanguageClient) {
+	//config変更時にlspを再起動
+	//importMap pathの入力途中でfile not foundエラーが出るため、2秒間間引く
+	let inputTimeoutId: NodeJS.Timeout
+	atom.config.onDidChange('atom-ide-deno', () => {
+		console.log('atom-ide-deno config change caught')
+		clearTimeout(inputTimeoutId)
+		inputTimeoutId = setTimeout(_ => {
+			denoLS.restartAllServers()
+		}, 2000)
+	})
+	atom.config.onDidChange('atom-ide-deno', () => {
+		denoLS._isDebugAtConfigFile = atom.config.get('core.debugLSP')
+	})
 
-//config変更時にlspを再起動
-//importMap pathの入力途中でfile not foundエラーが出るため、2秒間間引く
-let inputTimeoutId: NodeJS.Timeout
-atom.config.onDidChange('atom-ide-deno', () => {
-	console.log('atom-ide-deno config change caught')
-	clearTimeout(inputTimeoutId)
-	inputTimeoutId = setTimeout(_ => {
-		denoLS.restartAllServers()
-	}, 2000)
-})
-atom.config.onDidChange('atom-ide-deno', () => {
-	denoLS._isDebugAtConfigFile = atom.config.get('core.debugLSP')
-})
-export default denoLS
-
-/*
-virtual documentを表示
-*/
-atom.workspace.addOpener(filePath => {
-	if (!filePath.startsWith('deno://')) {
-		return
-	}
-	//autoHeightが無いとスクロールバーが出ない
-	const editor = new TextEditor({autoHeight: false})
-	//言語モードを設定
-	atom.grammars.assignLanguageMode(
-		editor.getBuffer(),
-		atom.grammars.selectGrammar(filePath, '' /*sourceText*/).scopeName
-	)
-	// デフォルトの表示
-	editor.setText('// please wait...\n')
-	//読み取り専用
-	editor.setReadOnly(true)
-	//タブ名
-	editor.getTitle = () => filePath
-	editor.getLongTitle = () => filePath
-	//保存を無効にする
-	// @ts-ignore
-	editor.shouldPromptToSave = () => false
-	//閉じるボタンの表示を調整
-	editor.isModified = () => false
-	editor.getBuffer().isModified = () => false
-	// defer execution until the content display is complete
-	// notice: return value is ignored
-	type trapFunctionName = 'setCursorBufferPosition' | 'scrollToBufferPosition'
-	const trapFunctions: Array<trapFunctionName> = ['setCursorBufferPosition', 'scrollToBufferPosition']
-	const calledArgs: {[P in trapFunctionName]?: any[][]} = {}
-	const originalFunctions: {[P in trapFunctionName]?: Function} = {}
-	for (const funcName of trapFunctions) {
-		calledArgs[funcName] = []
-		originalFunctions[funcName] = editor[funcName]
-		editor[funcName] = (...args: any[]) => calledArgs[funcName]?.push(args)
-	}
-	;(async _ => {
-		const doc = await denoLS.provideDenoVirtualTextDocument({
-			uri: filePath.replace('deno://', 'deno:/')
-		})
-		try {
-			await editor.setText(doc, {bypassReadOnly: true})
-		} catch {
-			editor.setText(`// load was failed. (${filePath.replace('deno://', 'deno:/')})`, {bypassReadOnly: true})
-		} finally {
-			// execute deferred function
-			for (const funcName of trapFunctions) {
-				// @ts-ignore
-				editor[funcName] = originalFunctions[funcName]
-				// @ts-ignore
-				calledArgs[funcName].forEach(args => editor[funcName](...args))
-			}
+	//virtual documentを表示
+	atom.workspace.addOpener(filePath => {
+		if (!filePath.startsWith('deno://')) {
+			return
 		}
-	})()
-	return editor
-})
+		//autoHeightが無いとスクロールバーが出ない
+		const editor = new TextEditor({autoHeight: false})
+		//言語モードを設定
+		atom.grammars.assignLanguageMode(
+			editor.getBuffer(),
+			atom.grammars.selectGrammar(filePath, '' /*sourceText*/).scopeName
+		)
+		// デフォルトの表示
+		editor.setText('// please wait...\n')
+		//読み取り専用
+		editor.setReadOnly(true)
+		//タブ名
+		editor.getTitle = () => filePath
+		editor.getLongTitle = () => filePath
+		//保存を無効にする
+		// @ts-ignore
+		editor.shouldPromptToSave = () => false
+		//閉じるボタンの表示を調整
+		editor.isModified = () => false
+		editor.getBuffer().isModified = () => false
+		// defer execution until the content display is complete
+		// notice: return value is ignored
+		type trapFunctionName = 'setCursorBufferPosition' | 'scrollToBufferPosition'
+		const trapFunctions: Array<trapFunctionName> = ['setCursorBufferPosition', 'scrollToBufferPosition']
+		const calledArgs: {[P in trapFunctionName]?: any[][]} = {}
+		const originalFunctions: {[P in trapFunctionName]?: Function} = {}
+		for (const funcName of trapFunctions) {
+			calledArgs[funcName] = []
+			originalFunctions[funcName] = editor[funcName]
+			editor[funcName] = (...args: any[]) => calledArgs[funcName]?.push(args)
+		}
+		;(async _ => {
+			const doc = await denoLS.getDenoVirtualTextDocument({
+				uri: filePath.replace('deno://', 'deno:/')
+			})
+			try {
+				await editor.setText(doc, {bypassReadOnly: true})
+			} catch {
+				editor.setText(`// load was failed. (${filePath.replace('deno://', 'deno:/')})`, {bypassReadOnly: true})
+			} finally {
+				// execute deferred function
+				for (const funcName of trapFunctions) {
+					// @ts-ignore
+					editor[funcName] = originalFunctions[funcName]
+					// @ts-ignore
+					calledArgs[funcName].forEach(args => editor[funcName](...args))
+				}
+			}
+		})()
+		return editor
+	})
+
+	//コマンド登録
+	type methodName = 'getDenoCacheAll' | 'getDenoReloadImportRegistries' | 'restartAllServers' | 'showDenoStatusDocument'
+	atom.commands.add(
+		'atom-workspace',
+		Object.fromEntries(
+			menu
+				.filter(v => v.label === 'Packages')
+				.flatMap(v => v.submenu)
+				.filter(v => v.label === 'Deno')
+				.flatMap(v => v.submenu)
+				.map(v => [
+					v.command,
+					{
+						didDispatch: () => {
+							denoLS[v.methodName as methodName]()
+						},
+						displayName: `Deno: ${v.label}`,
+						description: v.description
+					}
+				])
+		)
+	)
+}
