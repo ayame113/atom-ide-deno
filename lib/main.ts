@@ -1,5 +1,5 @@
-import {menu} from '../menus/main.json'
 import {config} from './config'
+import {menu} from '../menus/main.json'
 
 import {AutoLanguageClient, Convert, FilteredLogger} from 'atom-languageclient'
 import type {LanguageServerProcess, LanguageClientConnection, ActiveServer} from 'atom-languageclient'
