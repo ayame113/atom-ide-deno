@@ -1,3 +1,7 @@
+## 1.4.0
+ - Hotfix because 1.3 is broken
+ - The package size was temporarily bloated.
+
 ## 1.3.0
  - supports json file
  - supports ignature help provider
