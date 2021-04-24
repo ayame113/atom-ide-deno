@@ -19,7 +19,7 @@
 		"jsx": "react",
 		"jsxFactory": "etch.dom",
 		"lib": ["ESnext", "dom"],
-		"target": "es2015",
+		"target": "ESnext",
 		"allowJs": true,
 		"esModuleInterop": true,
 		"resolveJsonModule": true,
