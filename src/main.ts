@@ -8,10 +8,9 @@ import cp from 'child_process'
 
 const getDenoPath = () => atom.config.get('atom-ide-deno.path') || 'deno'
 
-
 class DenoLanguageClient extends AutoLanguageClient {
 	_isDebug = false
-	_isDebugAtConfigFile: boolean = atom.config.get("core.debugLSP")
+	_isDebugAtConfigFile: boolean = atom.config.get('core.debugLSP')
 	_emptyConnection!: LanguageClientConnection
 	//isDebug=true時に再起動
 	get isDebug() {
@@ -66,7 +65,10 @@ class DenoLanguageClient extends AutoLanguageClient {
 		return super.restartAllServers(...args)
 	}
 	getLogger() {
-		return new FilteredLogger(console, lebel=>this._isDebug||this._isDebugAtConfigFile||['warn', 'error'].includes(lebel))
+		return new FilteredLogger(
+			console,
+			lebel => this._isDebug || this._isDebugAtConfigFile || ['warn', 'error'].includes(lebel)
+		)
 	}
 	async getDefinition(...args: [TextEditor, Point]) {
 		const res = await super.getDefinition(...args)
@@ -175,7 +177,7 @@ atom.config.onDidChange('atom-ide-deno', () => {
 	}, 2000)
 })
 atom.config.onDidChange('atom-ide-deno', () => {
-	denoLS._isDebugAtConfigFile = atom.config.get("core.debugLSP")
+	denoLS._isDebugAtConfigFile = atom.config.get('core.debugLSP')
 })
 export default denoLS
 
