@@ -1,4 +1,4 @@
-import {AutoLanguageClient, Convert} from 'atom-languageclient'
+import {AutoLanguageClient, Convert, FilteredLogger} from 'atom-languageclient'
 import type {LanguageServerProcess, LanguageClientConnection, ActiveServer} from 'atom-languageclient'
 import type {ServerManager} from 'atom-languageclient/lib/server-manager'
 import type {Point} from 'atom'
@@ -8,16 +8,17 @@ import cp from 'child_process'
 
 const getDenoPath = () => atom.config.get('atom-ide-deno.path') || 'deno'
 
-let isDebug = false
 
 class DenoLanguageClient extends AutoLanguageClient {
+	_isDebug = false
+	_isDebugAtConfigFile: boolean = atom.config.get("core.debugLSP")
 	_emptyConnection!: LanguageClientConnection
 	//isDebug=true時に再起動
 	get isDebug() {
-		return isDebug
+		return this._isDebug
 	}
 	set isDebug(v) {
-		isDebug = v
+		this._isDebug = v
 		this.restartAllServers()
 	}
 	getGrammarScopes() {
@@ -64,15 +65,9 @@ class DenoLanguageClient extends AutoLanguageClient {
 		atom.notifications.addInfo('restart Deno Language server')
 		return super.restartAllServers(...args)
 	}
-	/*getSuggestionDetailsOnSelect(suggestion, ...args) {
-		//insertTextFormat==2の場合、スニペットとして解釈される
-		//スニペット用のテキストがlspから提供されてないので、通常の補完として利用する
-		if (this.isDebug) {console.log(suggestion)}
-		if (suggestion.snippet==='') {
-			suggestion.snippet = void 0
-		}
-		return super.getSuggestionDetailsOnSelect(suggestion, ...args)
-	}*/
+	getLogger() {
+		return new FilteredLogger(console, lebel=>this._isDebug||this._isDebugAtConfigFile||['warn', 'error'].includes(lebel))
+	}
 	async getDefinition(...args: [TextEditor, Point]) {
 		const res = await super.getDefinition(...args)
 		// prettier-ignore
@@ -178,6 +173,9 @@ atom.config.onDidChange('atom-ide-deno', () => {
 	inputTimeoutId = setTimeout(_ => {
 		denoLS.restartAllServers()
 	}, 2000)
+})
+atom.config.onDidChange('atom-ide-deno', () => {
+	denoLS._isDebugAtConfigFile = atom.config.get("core.debugLSP")
 })
 export default denoLS
 
