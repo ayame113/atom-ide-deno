@@ -1,4 +1,5 @@
 import {menu} from '../menus/main.json'
+import {config} from './config'
 
 import {AutoLanguageClient, Convert, FilteredLogger} from 'atom-languageclient'
 import type {LanguageServerProcess, LanguageClientConnection, ActiveServer} from 'atom-languageclient'
@@ -11,6 +12,7 @@ import cp from 'child_process'
 const getDenoPath = () => atom.config.get('atom-ide-deno.path') || 'deno'
 
 class DenoLanguageClient extends AutoLanguageClient {
+	config = config
 	_isDebug = false
 	_isDebugAtConfigFile: boolean = atom.config.get('core.debugLSP')
 	_emptyConnection!: LanguageClientConnection
