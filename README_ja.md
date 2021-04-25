@@ -1,4 +1,6 @@
-Translations: [English (en)](https://github.com/ayame113/atom-ide-deno/blob/master/README.md) [日本語 (ja)](https://github.com/ayame113/atom-ide-deno/blob/master/README_ja.md)
+Translations:
+[English (en)](https://github.com/ayame113/atom-ide-deno/blob/main/README.md)
+[日本語 (ja)](https://github.com/ayame113/atom-ide-deno/blob/main/README_ja.md)
 
 # atom-ide-deno
 
@@ -6,7 +8,7 @@ deno language serverによる、Atom-IDEのdenoサポート
 
 これは（denoチームではなく）コミュニティによって製作されたパッケージです。
 
-![screen shot](https://raw.githubusercontent.com/ayame113/atom-ide-deno/master/screenshot/1.png)
+![screen shot](https://raw.githubusercontent.com/ayame113/atom-ide-deno/main/screenshot/1.png)
 
 ## 使い方
 
@@ -20,16 +22,15 @@ deno language serverによる、Atom-IDEのdenoサポート
 
 atom-IDEについては[こちら](https://atom-community.io/)を参照。
 
-
 ## インストール
 
 設定＞インストール＞`atom-ide-deno`で検索＞インストール
 
 または、コマンドラインで以下を入力
+
 ```
 apm install atom-ide-deno
 ```
-
 
 ## 機能
 
@@ -39,7 +40,7 @@ apm install atom-ide-deno
 
 設定の構成は[vscode_deno](https://github.com/denoland/vscode_deno)と同様です。
 
- - lsp flags
+- lsp flags
   - Enables language server: Language Serverをオンにするかどうか
   - Enables code lens implementations: コードレンズの設定（現在Atomではサポートされていません）
   - Enables code lens references: コードレンズの設定（現在Atomではサポートされていません）
@@ -47,12 +48,12 @@ apm install atom-ide-deno
   - Path to import-map: import-mapへのファイルパス（相対パスはプロジェクトフォルダを起点に解決されます）
   - Path to tsconfig: tsconfigへのファイルパス（相対パスはプロジェクトフォルダを起点に解決されます）
   - Enables unstable: コードの型チェックに不安定なAPIを用いるかどうか
- - Deno path: Deno実行ファイルへのパス
-
+  - Deno path: Deno実行ファイルへのパス
 
 ## tips
 
 ### lspでdomを有効にするtsconfig.json
+
 ```
 {
   "compilerOptions": {
@@ -72,6 +73,7 @@ apm install atom-ide-deno
 ```
 
 ### ルートをプロジェクトフォルダに合わせるimportMap (プロジェクトフォルダ直下に置く)
+
 ```
 {
 	"imports": {
@@ -88,18 +90,16 @@ apm install atom-ide-deno
 ### デバッグモード
 
 `ctrl-shift-i`でコンソールを開き、以下のコマンドを入力
+
 ```
 atom.packages.activePackages['atom-ide-deno'].mainModule.isDebug = true
 ```
 
 > ⚠️ importMapやtsconfigを編集した後は、手動でエディタを再起動するか、オプションを編集してLSPを再起動してください。
 
-
 ## 貢献
 
-コントリビュートはお気軽にどうぞ。
-このパッケージの開発を引き継ぎたい人はお気軽にお声がけください。
-
+コントリビュートはお気軽にどうぞ。 このパッケージの開発を引き継ぎたい人はお気軽にお声がけください。
 
 ## ライセンス
 

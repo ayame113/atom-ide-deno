@@ -1,38 +1,38 @@
 {
-	"menu": [
-		{
-			"label": "Packages",
-			"submenu": [
-				{
-					"label": "Deno",
-					"submenu": [
-						{
-							"label": "Cache Dependencies",
-							"command": "deno.cache",
-							"description": "Cache the active workspace document and its dependencies.",
-							"methodName": "getDenoCacheAll"
-						},
-						{
-							"label": "Reload Import Registries Cache",
-							"command": "deno.reloadImportRegistries",
-							"description": "Reload any cached import registry responses.",
-							"methodName": "getDenoReloadImportRegistries"
-						},
-						{
-							"label": "Restart Language Server",
-							"command": "deno.restart",
-							"description": "Restart the Deno language server.",
-							"methodName": "restartAllServers"
-						},
-						{
-							"label": "Language Server Status",
-							"command": "deno.status",
-							"description": "Provide a status document of the language server.",
-							"methodName": "showDenoStatusDocument"
-						}
-					]
-				}
-			]
-		}
-	]
+  "menu": [
+    {
+      "label": "Packages",
+      "submenu": [
+        {
+          "label": "Deno",
+          "submenu": [
+            {
+              "label": "Cache Dependencies",
+              "command": "deno.cache",
+              "description": "Cache the active workspace document and its dependencies.",
+              "methodName": "getDenoCacheAll"
+            },
+            {
+              "label": "Reload Import Registries Cache",
+              "command": "deno.reloadImportRegistries",
+              "description": "Reload any cached import registry responses.",
+              "methodName": "getDenoReloadImportRegistries"
+            },
+            {
+              "label": "Restart Language Server",
+              "command": "deno.restart",
+              "description": "Restart the Deno language server.",
+              "methodName": "restartAllServers"
+            },
+            {
+              "label": "Language Server Status",
+              "command": "deno.status",
+              "description": "Provide a status document of the language server.",
+              "methodName": "showDenoStatusDocument"
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }
