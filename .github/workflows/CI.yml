@@ -28,4 +28,4 @@ jobs:
         run: npm run check
 
       - name: Lint ✨
-        run: npm run test.lint; true
+        run: npm run test.lint | echo -e $(cat)
