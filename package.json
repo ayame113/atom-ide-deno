@@ -51,9 +51,16 @@
         "0.1.0": "consumeDatatip"
       }
     },
-    "status-bar": {
+    "consumedServices": {
+      "console": {
+        "versions": {
+          "0.1.0": "consumeConsole"
+        }
+      }
+    },
+    "signature-help": {
       "versions": {
-        "^1.0.0": "consumeStatusBar"
+        "0.1.0": "consumeSignatureHelp"
       }
     },
     "atom-ide-busy-signal": {
@@ -61,9 +68,9 @@
         "0.1.0": "consumeBusySignal"
       }
     },
-    "signature-help": {
+    "status-bar": {
       "versions": {
-        "0.1.0": "consumeSignatureHelp"
+        "^1.0.0": "consumeStatusBar"
       }
     }
   },
@@ -73,24 +80,14 @@
         "2.0.0": "provideAutocomplete"
       }
     },
-    "code-actions": {
-      "versions": {
-        "0.1.0": "provideCodeActions"
-      }
-    },
-    "code-format.range": {
-      "versions": {
-        "0.1.0": "provideCodeFormat"
-      }
-    },
-    "code-highlight": {
-      "versions": {
-        "0.1.0": "provideCodeHighlight"
-      }
-    },
     "definitions": {
       "versions": {
         "0.1.0": "provideDefinitions"
+      }
+    },
+    "outline-view": {
+      "versions": {
+        "0.1.0": "provideOutlines"
       }
     },
     "find-references": {
@@ -98,9 +95,40 @@
         "0.1.0": "provideFindReferences"
       }
     },
-    "outline-view": {
+    "code-format.range": {
       "versions": {
-        "0.1.0": "provideOutlines"
+        "0.1.0": "provideRangeCodeFormat"
+      }
+    },
+    "code-format.file": {
+      "versions": {
+        "0.1.0": "provideFileCodeFormat"
+      }
+    },
+    "code-format.onSave": {
+      "versions": {
+        "0.1.0": "provideOnSaveCodeFormat"
+      }
+    },
+    "code-format.onType": {
+      "versions": {
+        "0.1.0": "provideOnTypeCodeFormat"
+      }
+    },
+    "code-highlight": {
+      "versions": {
+        "0.1.0": "provideCodeHighlight"
+      }
+    },
+    "code-actions": {
+      "versions": {
+        "0.1.0": "provideCodeActions"
+      }
+    },
+    "nuclide-refactor": {
+      "__comment": "I don't think there are any packages that use this feature anymore ...",
+      "versions": {
+        "0.0.0": "provideRefactor"
       }
     },
     "debugger.provider": {

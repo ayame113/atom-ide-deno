@@ -217,8 +217,9 @@ function onActivate(denoLS: DenoLanguageClient) {
       denoLS.restartAllServers();
     }, 2000);
   });
-  atom.config.onDidChange("atom-ide-deno", () => {
+  atom.config.onDidChange("core.debugLSP", () => {
     denoLS._isDebugAtConfigFile = atom.config.get("core.debugLSP");
+    denoLS.restartAllServers();
   });
 
   //virtual documentを表示
@@ -246,6 +247,10 @@ function onActivate(denoLS: DenoLanguageClient) {
     //閉じるボタンの表示を調整
     editor.isModified = () => false;
     editor.getBuffer().isModified = () => false;
+    //pendingモードにする（次回開いたときに表示されないようにする）
+    setTimeout((_) => {
+      (atom.workspace.getActivePane() as any).setPendingItem(editor);
+    }, 500);
     // defer execution until the content display is complete
     // notice: return value is ignored
     type trapFunctionName =
