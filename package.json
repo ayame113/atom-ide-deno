@@ -51,28 +51,28 @@
         "0.1.0": "consumeDatatip"
       }
     },
-		"consumedServices": {
-			"console": {
-				"versions": {
-					"0.1.0": "consumeConsole"
-				}
-			}
-		},
+    "consumedServices": {
+      "console": {
+        "versions": {
+          "0.1.0": "consumeConsole"
+        }
+      }
+    },
     "signature-help": {
       "versions": {
         "0.1.0": "consumeSignatureHelp"
       }
     },
-		"atom-ide-busy-signal": {
-			"versions": {
-				"0.1.0": "consumeBusySignal"
-			}
-		},
-		"status-bar": {
-			"versions": {
-				"^1.0.0": "consumeStatusBar"
-			}
-		}
+    "atom-ide-busy-signal": {
+      "versions": {
+        "0.1.0": "consumeBusySignal"
+      }
+    },
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
   },
   "providedServices": {
     "autocomplete.provider": {
@@ -80,56 +80,57 @@
         "2.0.0": "provideAutocomplete"
       }
     },
-		"definitions": {
-			"versions": {
-				"0.1.0": "provideDefinitions"
-			}
-		},
-		"outline-view": {
-			"versions": {
-				"0.1.0": "provideOutlines"
-			}
-		},
-		"find-references": {
-			"versions": {
-				"0.1.0": "provideFindReferences"
-			}
-		},
-		"code-format.range": {
-			"versions": {
-				"0.1.0": "provideRangeCodeFormat"
-			}
-		},
-		"code-format.file": {
-			"versions": {
-				"0.1.0": "provideFileCodeFormat"
-			}
-		},
-		"code-format.onSave": {
-			"versions": {
-				"0.1.0": "provideOnSaveCodeFormat"
-			}
-		},
-		"code-format.onType": {
-			"versions": {
-				"0.1.0": "provideOnTypeCodeFormat"
-			}
-		},
-		"code-highlight": {
-			"versions": {
-				"0.1.0": "provideCodeHighlight"
-			}
-		},
+    "definitions": {
+      "versions": {
+        "0.1.0": "provideDefinitions"
+      }
+    },
+    "outline-view": {
+      "versions": {
+        "0.1.0": "provideOutlines"
+      }
+    },
+    "find-references": {
+      "versions": {
+        "0.1.0": "provideFindReferences"
+      }
+    },
+    "code-format.range": {
+      "versions": {
+        "0.1.0": "provideRangeCodeFormat"
+      }
+    },
+    "code-format.file": {
+      "versions": {
+        "0.1.0": "provideFileCodeFormat"
+      }
+    },
+    "code-format.onSave": {
+      "versions": {
+        "0.1.0": "provideOnSaveCodeFormat"
+      }
+    },
+    "code-format.onType": {
+      "versions": {
+        "0.1.0": "provideOnTypeCodeFormat"
+      }
+    },
+    "code-highlight": {
+      "versions": {
+        "0.1.0": "provideCodeHighlight"
+      }
+    },
     "code-actions": {
       "versions": {
         "0.1.0": "provideCodeActions"
       }
     },
-		"nuclide-refactor": {
-			"versions": {
-				"0.0.0": "provideRefactor"
-			}
-		},
+    "nuclide-refactor": {
+      "__comment": "I don't think there are any packages that use this feature anymore ...",
+      "versions": {
+        "0.0.0": "provideRefactor"
+      }
+    },
     "debugger.provider": {
       "description": "deno debugger",
       "versions": {
