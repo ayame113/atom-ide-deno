@@ -1,4 +1,57 @@
-export const config = {
+export interface atomConfig {
+  [key: string]:
+    | configValObj
+    | configVal<String>
+    | configVal<Integer>
+    | configVal<Number>
+    | configVal<Boolean>
+    | configVal<Color>
+    | configValArray<String>
+    | configValArray<Integer>
+    | configValArray<Number>
+    | configValArray<Boolean>
+    | configValArray<Color>;
+}
+
+interface configValBase {
+  title: string;
+  description?: string;
+  type:
+    | "object"
+    | "array"
+    | "string"
+    | "integer"
+    | "number"
+    | "boolean"
+    | "color"
+    | "never";
+  order: number;
+}
+interface configValObj extends configValBase {
+  type: "object";
+  properties: atomConfig;
+}
+interface configVal<T> extends configValBase {
+  type: TypeName<T>;
+  default: T;
+}
+interface configValArray<T> extends configValBase {
+  type: "array";
+  default: Array<T>;
+  items: {
+    type: TypeName<T>;
+  };
+}
+type TypeName<T> = T extends String ? "string"
+  : T extends Integer ? "integer"
+  : T extends Number ? "number"
+  : T extends Boolean ? "boolean"
+  : T extends Color ? "color"
+  : "never";
+type Color = String;
+type Integer = Number;
+
+export const config: atomConfig = {
   lspFlags: {
     title: "lsp flags",
     description:
@@ -120,12 +173,79 @@ export const config = {
       },
     },
   },
+  format: {
+    title: "Format options",
+    type: "object",
+    order: 10,
+    properties: {
+      onSave: {
+        title: "Format on save",
+        type: "object",
+        order: 11,
+        properties: {
+          enable: {
+            title: "enables",
+            type: "boolean",
+            default: true,
+            order: 11,
+          },
+          extensions: {
+            title: "File type to enable",
+            type: "object",
+            order: 12,
+            properties: {
+              "source_js": {
+                title: "JavaScript",
+                type: "boolean",
+                default: true,
+                order: 13,
+              },
+              "source_ts": {
+                title: "TypeScript",
+                type: "boolean",
+                default: true,
+                order: 14,
+              },
+              "source_gfm": {
+                title: "markdown",
+                type: "boolean",
+                default: true,
+                order: 15,
+              },
+              "source_json": {
+                title: "json",
+                type: "boolean",
+                default: true,
+                order: 16,
+              },
+            },
+          },
+        },
+      },
+      onCommand: {
+        title: "Format on command",
+        type: "object",
+        order: 17,
+        properties: {
+          excludDir: {
+            title: "Excluded directories list when command `Format All File`",
+            type: "array",
+            order: 18,
+            default: ["./node_modules/"],
+            items: {
+              type: "string",
+            },
+          },
+        },
+      },
+    },
+  },
   path: {
     title: "Deno path",
     description:
-      "Path to the deno executable.（ex. `/usr/bin/deno`, `C:\\Program Files\\deno\\deno.exe`）",
+      "Path to the deno executable.（ex. `/usr/bin/deno`, `C:\\\\Program Files\\\\deno\\\\deno.exe`）",
     type: "string",
     default: "",
-    order: 10,
+    order: 19,
   },
 };

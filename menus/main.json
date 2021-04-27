@@ -29,6 +29,18 @@
               "command": "deno.status",
               "description": "Provide a status document of the language server.",
               "methodName": "showDenoStatusDocument"
+            },
+            {
+              "label": "Format Current File",
+              "command": "deno.formatCurrent",
+              "description": "Format current file.",
+              "methodName": "formatCurrent"
+            },
+            {
+              "label": "Format All File",
+              "command": "deno.formatAll",
+              "description": "Format all files in the workspace.",
+              "methodName": "formatAll"
             }
           ]
         }
