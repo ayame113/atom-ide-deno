@@ -17,10 +17,12 @@ This is a package produced by the community (not the deno team).
 2. install this package
 3. install [atom-ide-base](https://atom.io/packages/atom-ide-base) package
 
-> ⚠️ `atom-ide-ui` package was deprecated
+> ⚠️ `atom-ide-ui` package has moved to `atom-ide-base` package.
 
 > ⚠️ The `atom-ide-javascript` package is for Node.js. It has nothing to do with
 > this extension.
+
+Please see [here](./docs/) to complete setting.
 
 Please see [here](https://atom-community.io/) for atom-IDE.
 
