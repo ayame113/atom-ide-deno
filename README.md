@@ -4,6 +4,11 @@ Translations:
 
 # atom-ide-deno
 
+[![CI](https://github.com/ayame113/atom-ide-deno/actions/workflows/CI.yml/badge.svg)](https://github.com/ayame113/atom-ide-deno/actions/workflows/CI.yml)
+[![Dependency Status](https://david-dm.org/ayame113/atom-ide-deno.svg)](https://david-dm.org/ayame113/atom-ide-deno)
+[![apm](https://img.shields.io/apm/dm/atom-ide-deno.svg)](https://github.com/ayame113/atom-ide-deno)
+[![apm](https://img.shields.io/apm/v/atom-ide-deno.svg)](https://github.com/ayame113/atom-ide-deno)
+
 Javascript and TypeScript language support for Atom-IDE, powered by the deno
 language server.
 
