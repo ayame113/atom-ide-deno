@@ -54,8 +54,8 @@ Implementation list of Deno and Atom IDE
 Currently (2021), you can use more features by installing both Atom IDE Base and
 Atom IDE UI and turning off unused features from the Atom IDE UI settings.
 
-So far, the settings I have made for the Atom IDE UI are those in the image
-below.
+So far, you should be able to use more features by making the following settings
+in the Atom IDE UI.
 
 setting > enabled features
 
@@ -134,4 +134,4 @@ hover on symbol, then "menu > nuclid > rename"
 Install this package.
 
 Atom IDE UI's formatting was dosen't work because of error, so `deno fmt`
-command in this package inside.
+command was used in this package inside.
