@@ -5,7 +5,7 @@ the Atom IDE UI package are still available.
 
 Implementation list of Deno and Atom IDE
 
-|                                  | UI                                                    | Base                       |                                               |   |
+|                                  | Atom IDE UI                                           | Atom IDE Base              | Deno                                          |   |
 | -------------------------------- | ----------------------------------------------------- | -------------------------- | --------------------------------------------- | - |
 | window/showMessage               |                                                       | ○                          |                                               |   |
 | window/showMessageRequest        |                                                       | ○                          |                                               |   |
