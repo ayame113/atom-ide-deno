@@ -248,4 +248,11 @@ export const config: atomConfig = {
     default: "",
     order: 19,
   },
+  debugMode: {
+    title: "debug mode",
+    description: "Output log to console (ctrl+shift+i)",
+    type: "boolean",
+    default: false,
+    order: 20,
+  },
 };
