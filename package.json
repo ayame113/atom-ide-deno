@@ -31,6 +31,7 @@
   "devDependencies": {
     "@types/atom": "1.40.10",
     "@types/node": "^14.14.37",
+    "atom-select-list": "^0.8.0",
     "deno-bin": "github:ayame113/deno-bin",
     "vscode-languageserver-protocol": "^3.16.0"
   },

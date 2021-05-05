@@ -1,6 +1,8 @@
-import { config } from "./config";
+import { config, keyboardInputsKeyPath } from "./config";
 import type { atomConfig } from "./config";
 import * as formatter from "./formatter";
+import { addLinterOnlyMode } from "./linter_only";
+import * as autoConfig from "./auto_config";
 import { menu } from "../menus/main.json";
 
 import {
@@ -16,6 +18,7 @@ import type {
 import type { ServerManager } from "atom-languageclient/lib/server-manager";
 import type { Point } from "atom";
 import { CompositeDisposable, TextEditor } from "atom";
+import type { StatusBar } from "atom/status-bar";
 import type { TextDocumentIdentifier } from "vscode-languageserver-protocol";
 import cp from "child_process";
 import path from "path";
@@ -35,7 +38,7 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   debugLog(...msg: any[]) {
     if (this._isDebug) {
-      console.log(...msg);
+      console.trace(...msg);
     }
   }
   getGrammarScopes() {
@@ -85,9 +88,11 @@ class DenoLanguageClient extends AutoLanguageClient {
     super.activate();
     this.subscriptions = new CompositeDisposable();
     onActivate(this);
+    autoConfig.activate({ grammarScopes: this.getGrammarScopes() });
   }
   async deactivate() {
     this.debugLog("deactivating...");
+    autoConfig.deactivate();
     await super.deactivate();
     this.subscriptions?.dispose();
   }
@@ -233,25 +238,69 @@ class DenoLanguageClient extends AutoLanguageClient {
       });
     }
   }
+  // DenoMode / NodeMode
+  _linterOnly = false;
+  setLinterOnlyMode(v: boolean) {
+    this._linterOnly = v;
+  }
+  consumeStatusBar(statusBar: StatusBar) {
+    autoConfig.consumeStatusBar(statusBar);
+  }
 }
 
-export default new DenoLanguageClient();
+export default addLinterOnlyMode(new DenoLanguageClient());
 function onActivate(denoLS: DenoLanguageClient) {
   //config変更時にlspを再起動
-  //importMap pathの入力途中でfile not foundエラーが出るため、2秒間間引く
+  //文字列の入力途中でfile not foundエラーが出るため、2秒間間引く
   let inputTimeoutId: NodeJS.Timeout;
-  function restartServer() {
+  function restartServer(
+    { oldValue = {}, newValue }: { oldValue?: any; newValue: any },
+    keyPathbase: string[],
+  ) {
     console.log("atom-ide-deno config change caught");
     clearTimeout(inputTimeoutId);
-    inputTimeoutId = setTimeout((_) => {
+    let isDefferRestart = false;
+    //keyboardInputsKeyPathに含まれるキーの値が変更されていれば、実行を延期（間引く）
+    for (const keyPath of keyboardInputsKeyPath) {
+      //無関係なkeyPathは無視
+      if (!keyPathbase.every((v, i) => keyPath[i] == v)) {
+        continue;
+      }
+      //keyPathbaseを起点としてdiff
+      let oldV = oldValue;
+      let newV = newValue;
+      for (const key of keyPath.slice(keyPathbase.length)) {
+        oldV = oldV?.[key];
+        newV = newV?.[key];
+      }
+      //値は配列か文字列か数値
+      isDefferRestart = JSON.stringify(oldV) !== JSON.stringify(newV);
+      if (isDefferRestart) {
+        break;
+      }
+    }
+    if (isDefferRestart) {
+      inputTimeoutId = setTimeout(() => {
+        denoLS.restartAllServers();
+      }, 2000);
+    } else {
       denoLS.restartAllServers();
-    }, 2000);
+    }
   }
-  denoLS.subscriptions?.add(
-    atom.config.onDidChange("atom-ide-deno.lspFlags", restartServer),
-    atom.config.onDidChange("atom-ide-deno.path", restartServer),
-    atom.config.observe("atom-ide-deno.debugMode", (newValue) => {
+  denoLS.subscriptions.add(
+    atom.config.onDidChange(
+      "atom-ide-deno.lspFlags",
+      (v) => restartServer(v, ["lspFlags"]),
+    ),
+    atom.config.onDidChange(
+      "atom-ide-deno.path",
+      (v) => restartServer(v, ["path"]),
+    ),
+    atom.config.observe("atom-ide-deno.advanced.debugMode", (newValue) => {
       denoLS.setDebugMode(newValue);
+    }),
+    atom.config.observe("atom-ide-deno.advanced.linterOnly", (newValue) => {
+      denoLS.setLinterOnlyMode(newValue);
     }),
     //virtual documentを表示
     atom.workspace.addOpener((filePath) => {
@@ -298,7 +347,7 @@ function onActivate(denoLS: DenoLanguageClient) {
         originalFunctions[funcName] = editor[funcName];
         editor[funcName] = (...args: any[]) => calledArgs[funcName]?.push(args);
       }
-      (async (_) => {
+      (async () => {
         const doc = await denoLS.getDenoVirtualTextDocument({
           uri: filePath.replace("deno://", "deno:/"),
         });
@@ -322,6 +371,7 @@ function onActivate(denoLS: DenoLanguageClient) {
       return editor;
     }),
     //コマンド登録
+    //コマンドの内容はmenu/main.jsonで管理
     atom.commands.add(
       "atom-workspace",
       Object.fromEntries(
