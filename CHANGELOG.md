@@ -1,3 +1,13 @@
+## 1.6.0
+- Auto config for Deno and Node.js"
+- Toggle between Deno mode and Node.js mode with a one click.
+- fix bug when outline-view result was null (atom-community/atom-languageclient#150)
+
+## 1.5.0
+- format on save
+- format on Format Current File command (or menu > packages > Deno > Format Curent File)
+- format on Format All File command (or menu > packages > Deno > Format All File)
+
 ## 1.4.0
  - Hotfix because 1.3 is broken
  - The package size was temporarily bloated.
