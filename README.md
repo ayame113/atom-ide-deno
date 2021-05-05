@@ -54,6 +54,11 @@ are available.
 The configuration of the settings is similar to
 [vscode_deno](https://github.com/denoland/vscode_deno).
 
+- Auto config for Deno and Node.js:
+  - You can freely combine the runtime (Deno or Node.js), linter (deno_lint or
+    eslint), and formatter (deno_fmt or prettier). Please note that this rewrite
+    your settings. This is disabled by default.
+    ![auto config](https://raw.githubusercontent.com/ayame113/atom-ide-deno/main/screenshot/auto_config.png)
 - lsp flags
   - Enables language server: Whether to turn on Language Server
   - Enables code lens implementations: Code lens settings (currently not

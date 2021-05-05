@@ -1,15 +1,15 @@
 export interface atomConfig {
   [key: string]:
     | configValObj
-    | configVal<String>
+    | configVal<string>
     | configVal<Integer>
-    | configVal<Number>
-    | configVal<Boolean>
+    | configVal<number>
+    | configVal<boolean>
     | configVal<Color>
-    | configValArray<String>
+    | configValArray<string>
     | configValArray<Integer>
-    | configValArray<Number>
-    | configValArray<Boolean>
+    | configValArray<number>
+    | configValArray<boolean>
     | configValArray<Color>;
 }
 
@@ -44,10 +44,10 @@ interface configValArray<T> extends configValBase {
     type: TypeName<T>;
   };
 }
-type TypeName<T> = T extends String ? "string"
+type TypeName<T> = T extends string ? "string"
   : T extends Integer ? "integer"
-  : T extends Number ? "number"
-  : T extends Boolean ? "boolean"
+  : T extends number ? "number"
+  : T extends boolean ? "boolean"
   : T extends Color ? "color"
   : "never";
 
@@ -55,8 +55,8 @@ interface enumContent<T> {
   value: T;
   description?: string;
 }
-type Color = String;
-type Integer = Number;
+type Color = string;
+type Integer = number;
 
 export const config: atomConfig = {
   modes: {
