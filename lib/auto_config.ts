@@ -51,7 +51,7 @@ export function activate({ grammarScopes }: { grammarScopes: string[] }) {
       if (
         grammarScopes.includes(editor?.getGrammar?.()?.scopeName) ||
         atom.workspace.getPaneItems().some((e: any) =>
-          e?.getURI() == "atom://config"
+          e?.getURI?.() == "atom://config"
         )
       ) {
         statusBarElement.classList.remove(
@@ -134,9 +134,7 @@ function changeMode() {
         (atom.workspace.getActiveTextEditor() as any).getElement(),
         "linter:lint",
       );
-    } catch (_) {
-      _;
-    }
+    } catch (_) {}
   })();
   // formatter
   {
