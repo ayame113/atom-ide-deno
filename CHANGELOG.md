@@ -1,3 +1,6 @@
+## 1.7.0
+- fix bug (Uncaught TypeError: e?.getURI is not a function #40)
+
 ## 1.6.0
 - Auto config for Deno and Node.js
   - Toggle between Deno mode and Node.js mode with a one click.
