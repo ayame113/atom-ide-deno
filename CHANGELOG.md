@@ -1,3 +1,6 @@
+## 1.8.0
+- Update dependencies (#43)
+
 ## 1.7.0
 - fix bug (Uncaught TypeError: e?.getURI is not a function #40)
 
