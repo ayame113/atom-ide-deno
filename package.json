@@ -137,6 +137,11 @@
       "versions": {
         "0.0.0": "createDebuggerProvider"
       }
+    },
+    "call-hierarchy": {
+      "versions": {
+        "0.0.0": "provideCallHierarchy"
+      }
     }
   }
 }
