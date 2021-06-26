@@ -7,10 +7,14 @@ import type {
 } from "atom-languageclient/lib/languageclient";
 import type { Point, TextEditor } from "atom";
 
-import OutlineViewAdapter from 'atom-languageclient/build/lib/adapters/outline-view-adapter'
+import OutlineViewAdapter from "atom-languageclient/build/lib/adapters/outline-view-adapter";
 
 import * as lsp from "vscode-languageserver-protocol";
-import type { CallHierarchy, CallHierarchyItem, CallHierarchyType } from "./call-hierarchy";
+import type {
+  CallHierarchy,
+  CallHierarchyItem,
+  CallHierarchyType,
+} from "./call-hierarchy";
 
 /** Public: Adapts the documentSymbolProvider of the language server to the Outline View supplied by Atom IDE UI. */
 export default class CallHierarchyAdapter {
@@ -53,20 +57,29 @@ export default class CallHierarchyAdapter {
     );
     return {
       type,
-      data: results?.map?.(parseCallHierarchyItem)??[],
+      data: results?.map?.(parseCallHierarchyItem) ?? [],
       itemAt(n: number): Promise<CallHierarchy<T>> {
-        if (type==='incoming') {
-          return this.adapter.getIncoming(this.connection, this.data[n].rawData) as Promise<CallHierarchy<T>>
+        if (type === "incoming") {
+          return this.adapter.getIncoming(
+            this.connection,
+            this.data[n].rawData,
+          ) as Promise<CallHierarchy<T>>;
         } else {
-          return this.adapter.getOutgoing(this.connection, this.data[n].rawData) as Promise<CallHierarchy<T>>
+          return this.adapter.getOutgoing(
+            this.connection,
+            this.data[n].rawData,
+          ) as Promise<CallHierarchy<T>>;
         }
       },
       connection,
-      adapter: this
-    } as CallHierarchyWithAdapter<T>
+      adapter: this,
+    } as CallHierarchyWithAdapter<T>;
   }
-  async getIncoming(connection: LanguageClientConnection, item: lsp.CallHierarchyItem):Promise<CallHierarchy<'incoming'>>{
-    const requestParam: lsp.CallHierarchyIncomingCallsParams = {item};
+  async getIncoming(
+    connection: LanguageClientConnection,
+    item: lsp.CallHierarchyItem,
+  ): Promise<CallHierarchy<"incoming">> {
+    const requestParam: lsp.CallHierarchyIncomingCallsParams = { item };
     const results = await Utils.doWithCancellationToken(
       connection,
       this._cancellationTokens,
@@ -79,17 +92,20 @@ export default class CallHierarchyAdapter {
         ),
     );
     return {
-      type: 'incoming',
-      data: results?.map?.(l=>parseCallHierarchyItem(l.from))||[],
+      type: "incoming",
+      data: results?.map?.((l) => parseCallHierarchyItem(l.from)) || [],
       itemAt(n: number) {
-        return this.adapter.getIncoming(this.connection, this.data[n].rawData)
+        return this.adapter.getIncoming(this.connection, this.data[n].rawData);
       },
       connection,
-      adapter: this
-    } as CallHierarchyWithAdapter<'incoming'>
+      adapter: this,
+    } as CallHierarchyWithAdapter<"incoming">;
   }
-  async getOutgoing(connection: LanguageClientConnection, item: lsp.CallHierarchyItem):Promise<CallHierarchy<'outgoing'>>{
-    const requestParam: lsp.CallHierarchyOutgoingCallsParams = {item};
+  async getOutgoing(
+    connection: LanguageClientConnection,
+    item: lsp.CallHierarchyItem,
+  ): Promise<CallHierarchy<"outgoing">> {
+    const requestParam: lsp.CallHierarchyOutgoingCallsParams = { item };
     const results = await Utils.doWithCancellationToken(
       connection,
       this._cancellationTokens,
@@ -102,36 +118,39 @@ export default class CallHierarchyAdapter {
         ),
     );
     return {
-      type: 'outgoing',
-      data: results?.map?.(l=>parseCallHierarchyItem(l.to))||[],
+      type: "outgoing",
+      data: results?.map?.((l) => parseCallHierarchyItem(l.to)) || [],
       itemAt(n: number) {
-        return this.adapter.getOutgoing(this.connection, this.data[n].rawData)
+        return this.adapter.getOutgoing(this.connection, this.data[n].rawData);
       },
       connection,
-      adapter: this
-    } as CallHierarchyWithAdapter<'outgoing'>
+      adapter: this,
+    } as CallHierarchyWithAdapter<"outgoing">;
   }
 }
 
-function parseCallHierarchyItem(rawData:lsp.CallHierarchyItem):CallHierarchyItemWithAdapter {
+function parseCallHierarchyItem(
+  rawData: lsp.CallHierarchyItem,
+): CallHierarchyItemWithAdapter {
   return {
     path: Convert.uriToPath(rawData.uri),
     name: rawData.name,
-    icon:  OutlineViewAdapter.symbolKindToEntityKind(rawData.kind),
+    icon: OutlineViewAdapter.symbolKindToEntityKind(rawData.kind),
     //tags?: SymbolTag[]; <- isDeprecated?1:0
     detail: rawData.detail,
     range: Convert.lsRangeToAtomRange(rawData.range),
     selectionRange: Convert.lsRangeToAtomRange(rawData.selectionRange),
-    rawData
-  }
+    rawData,
+  };
 }
 
-interface CallHierarchyWithAdapter<T extends CallHierarchyType> extends CallHierarchy<T> {
+interface CallHierarchyWithAdapter<T extends CallHierarchyType>
+  extends CallHierarchy<T> {
   data: CallHierarchyItemWithAdapter[];
   adapter: CallHierarchyAdapter;
   connection: LanguageClientConnection;
 }
 
 interface CallHierarchyItemWithAdapter extends CallHierarchyItem {
-  rawData: lsp.CallHierarchyItem
+  rawData: lsp.CallHierarchyItem;
 }
