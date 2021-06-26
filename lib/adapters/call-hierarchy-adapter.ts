@@ -1,18 +1,16 @@
-import type * as atomIde from "atom-ide-base";
-import Convert from "atom-languageclient/lib/convert";
-import * as Utils from "atom-languageclient/lib/utils";
-import { CancellationTokenSource } from "vscode-jsonrpc";
-import {
-  DocumentSymbol,
+import { Convert } from "atom-languageclient";
+import * as Utils from "atom-languageclient/build/lib/utils";
+import type { CancellationTokenSource } from "vscode-jsonrpc";
+import type {
   LanguageClientConnection,
   ServerCapabilities,
-  SymbolInformation,
-  SymbolKind,
 } from "atom-languageclient/lib/languageclient";
-import { Point, TextEditor } from "atom";
+import type { Point, TextEditor } from "atom";
+
+import OutlineViewAdapter from 'atom-languageclient/build/lib/adapters/outline-view-adapter'
 
 import * as lsp from "vscode-languageserver-protocol";
-import { CallHierarchy } from "./call-hierarchy";
+import type { CallHierarchy, CallHierarchyItem } from "./call-hierarchy";
 
 /** Public: Adapts the documentSymbolProvider of the language server to the Outline View supplied by Atom IDE UI. */
 export default class CallHierarchyAdapter {
@@ -37,7 +35,7 @@ export default class CallHierarchyAdapter {
     editor: TextEditor,
     point: Point,
     type: T,
-  ): Promise<CallHierarchy<T>> {
+  ): Promise<CallHierarchyWithAdapter<T>> {
     const requestParam: lsp.CallHierarchyPrepareParams = {
       textDocument: Convert.editorToTextDocumentIdentifier(editor),
       position: Convert.pointToPosition(point),
@@ -46,265 +44,94 @@ export default class CallHierarchyAdapter {
       connection,
       this._cancellationTokens,
       (_cancellationToken) =>
+        //ignore private
+        // @ts-ignore
         connection._sendRequest(
           lsp.CallHierarchyPrepareRequest.type,
           requestParam,
         ),
     );
-    console.log(results);
     return {
       type,
-      data: [],
-      itemAt(_n: number) {
-        return Promise.resolve(this);
+      data: results?.map?.(parseCallHierarchyItem)??[],
+      itemAt(n: number): Promise<CallHierarchy<T>> {
+        if (type==='incoming') {
+          return this.adapter.getIncoming(this.connection, this.data[n].rawData) as Promise<CallHierarchy<T>>
+        } else {
+          return this.adapter.getOutgoing(this.connection, this.data[n].rawData) as Promise<CallHierarchy<T>>
+        }
       },
-    };
+      connection,
+      adapter: this
+    } as CallHierarchyWithAdapter<T>
   }
-
-  /**
-   * Public: Obtain the Outline for document via the {LanguageClientConnection} as identified by the {TextEditor}.
-   *
-   * @param connection A {LanguageClientConnection} to the language server that will be queried for the outline.
-   * @param editor The Atom {TextEditor} containing the text the Outline should represent.
-   * @returns A {Promise} containing the {Outline} of this document.
-   */
-  /*public async getOutline(
-    connection: LanguageClientConnection,
-    editor: TextEditor,
-  ): Promise<atomIde.Outline | null> {
+  async getIncoming(connection: LanguageClientConnection, item: lsp.CallHierarchyItem):Promise<CallHierarchy<'incoming'>>{
+    const requestParam: lsp.CallHierarchyIncomingCallsParams = {item};
     const results = await Utils.doWithCancellationToken(
       connection,
       this._cancellationTokens,
-      (cancellationToken) =>
-        connection.documentSymbol({
-          textDocument: Convert.editorToTextDocumentIdentifier(editor),
-        }, cancellationToken),
+      (_cancellationToken) =>
+        //ignore private
+        // @ts-ignore
+        connection._sendRequest(
+          lsp.CallHierarchyIncomingCallsRequest.type,
+          requestParam,
+        ),
     );
-
-    if (results === null || results.length === 0) {
-      return {
-        outlineTrees: [],
-      };
-    }
-
-    if ((results[0] as DocumentSymbol).selectionRange !== undefined) {
-      // If the server is giving back the newer DocumentSymbol format.
-      return {
-        outlineTrees: OutlineViewAdapter.createHierarchicalOutlineTrees(
-          results as DocumentSymbol[],
-        ),
-      };
-    } else {
-      // If the server is giving back the original SymbolInformation format.
-      return {
-        outlineTrees: OutlineViewAdapter.createOutlineTrees(
-          results as SymbolInformation[],
-        ),
-      };
-    }
-  }*/
-
-  /**
-   * Public: Create an {Array} of {OutlineTree}s from the Array of {DocumentSymbol} recieved from the language server.
-   * This includes converting all the children nodes in the entire hierarchy.
-   *
-   * @param symbols An {Array} of {DocumentSymbol}s received from the language server that should be converted to an
-   *   {Array} of {OutlineTree}.
-   * @returns An {Array} of {OutlineTree} containing the given symbols that the Outline View can display.
-   */
-  /*public static createHierarchicalOutlineTrees(
-    symbols: DocumentSymbol[],
-  ): atomIde.OutlineTree[] {
-    // Sort all the incoming symbols
-    symbols.sort((a, b) => {
-      if (a.range.start.line !== b.range.start.line) {
-        return a.range.start.line - b.range.start.line;
-      }
-
-      if (a.range.start.character !== b.range.start.character) {
-        return a.range.start.character - b.range.start.character;
-      }
-
-      if (a.range.end.line !== b.range.end.line) {
-        return a.range.end.line - b.range.end.line;
-      }
-
-      return a.range.end.character - b.range.end.character;
-    });
-
-    return symbols.map((symbol) => {
-      const tree = OutlineViewAdapter.hierarchicalSymbolToOutline(symbol);
-
-      if (symbol.children != null) {
-        tree.children = OutlineViewAdapter.createHierarchicalOutlineTrees(
-          symbol.children,
-        );
-      }
-
-      return tree;
-    });
-  }*/
-
-  /**
-   * Public: Create an {Array} of {OutlineTree}s from the Array of {SymbolInformation} recieved from the language
-   * server. This includes determining the appropriate child and parent relationships for the hierarchy.
-   *
-   * @param symbols An {Array} of {SymbolInformation}s received from the language server that should be converted to an
-   *   {OutlineTree}.
-   * @returns An {OutlineTree} containing the given symbols that the Outline View can display.
-   */
-  /*public static createOutlineTrees(
-    symbols: SymbolInformation[],
-  ): atomIde.OutlineTree[] {
-    symbols.sort((a, b) => {
-      if (a.location.range.start.line === b.location.range.start.line) {
-        return a.location.range.start.character -
-          b.location.range.start.character;
-      } else {
-        return a.location.range.start.line - b.location.range.start.line;
-      }
-    });
-
-    // Temporarily keep containerName through the conversion process
-    // Also filter out symbols without a name - it's part of the spec but some don't include it
-    const allItems = symbols
-      .filter((symbol) => symbol.name)
-      .map((symbol) => ({
-        containerName: symbol.containerName,
-        outline: OutlineViewAdapter.symbolToOutline(symbol),
-      }));
-
-    // Create a map of containers by name with all items that have that name
-    const containers = allItems.reduce((map, item) => {
-      const name = item.outline.representativeName;
-      if (name != null) {
-        const container = map.get(name);
-        if (container == null) {
-          map.set(name, [item.outline]);
-        } else {
-          container.push(item.outline);
-        }
-      }
-      return map;
-    }, new Map());
-
-    const roots: atomIde.OutlineTree[] = [];
-
-    // Put each item within its parent and extract out the roots
-    for (const item of allItems) {
-      const containerName = item.containerName;
-      const child = item.outline;
-      if (containerName == null || containerName === "") {
-        roots.push(item.outline);
-      } else {
-        const possibleParents = containers.get(containerName);
-        let closestParent = OutlineViewAdapter._getClosestParent(
-          possibleParents,
-          child,
-        );
-        if (closestParent == null) {
-          closestParent = {
-            plainText: containerName,
-            representativeName: containerName,
-            startPosition: new Point(0, 0),
-            children: [child],
-          };
-          roots.push(closestParent);
-          if (possibleParents == null) {
-            containers.set(containerName, [closestParent]);
-          } else {
-            possibleParents.push(closestParent);
-          }
-        } else {
-          closestParent.children.push(child);
-        }
-      }
-    }
-
-    return roots;
+    return {
+      type: 'incoming',
+      data: results?.map?.(l=>parseCallHierarchyItem(l.from))||[],
+      itemAt(n: number) {
+        return this.adapter.getIncoming(this.connection, this.data[n].rawData)
+      },
+      connection,
+      adapter: this
+    } as CallHierarchyWithAdapter<'incoming'>
   }
-
-  private static _getClosestParent(
-    candidates: atomIde.OutlineTree[] | null,
-    child: atomIde.OutlineTree,
-  ): atomIde.OutlineTree | null {
-    if (candidates == null || candidates.length === 0) {
-      return null;
-    }
-
-    let parent: atomIde.OutlineTree | undefined;
-    for (const candidate of candidates) {
-      if (
-        candidate !== child &&
-        candidate.startPosition.isLessThanOrEqual(child.startPosition) &&
-        (candidate.endPosition === undefined ||
-          (child.endPosition &&
-            candidate.endPosition.isGreaterThanOrEqual(child.endPosition)))
-      ) {
-        if (
-          parent === undefined ||
-          parent.startPosition.isLessThanOrEqual(candidate.startPosition) ||
-          (parent.endPosition != null &&
-            candidate.endPosition &&
-            parent.endPosition.isGreaterThanOrEqual(candidate.endPosition))
-        ) {
-          parent = candidate;
-        }
-      }
-    }
-
-    return parent || null;
-  }*/
-
-  /**
-   * Public: Convert an individual {DocumentSymbol} from the language server to an {OutlineTree} for use by the Outline
-   * View. It does NOT recursively process the given symbol's children (if any).
-   *
-   * @param symbol The {DocumentSymbol} to convert to an {OutlineTree}.
-   * @returns The {OutlineTree} corresponding to the given {DocumentSymbol}.
-   */
-  /*public static hierarchicalSymbolToOutline(
-    symbol: DocumentSymbol,
-  ): atomIde.OutlineTree {
-    const icon = OutlineViewAdapter.symbolKindToEntityKind(symbol.kind);
-
+  async getOutgoing(connection: LanguageClientConnection, item: lsp.CallHierarchyItem):Promise<CallHierarchy<'outgoing'>>{
+    const requestParam: lsp.CallHierarchyOutgoingCallsParams = {item};
+    const results = await Utils.doWithCancellationToken(
+      connection,
+      this._cancellationTokens,
+      (_cancellationToken) =>
+        //ignore private
+        // @ts-ignore
+        connection._sendRequest(
+          lsp.CallHierarchyOutgoingCallsRequest.type,
+          requestParam,
+        ),
+    );
     return {
-      tokenizedText: [
-        {
-          kind: OutlineViewAdapter.symbolKindToTokenKind(symbol.kind),
-          value: symbol.name,
-        },
-      ],
-      icon: icon != null ? icon : undefined,
-      representativeName: symbol.name,
-      startPosition: Convert.positionToPoint(symbol.selectionRange.start),
-      endPosition: Convert.positionToPoint(symbol.selectionRange.end),
-      children: [],
-    };
-  }*/
+      type: 'outgoing',
+      data: results?.map?.(l=>parseCallHierarchyItem(l.to))||[],
+      itemAt(n: number) {
+        return this.adapter.getOutgoing(this.connection, this.data[n].rawData)
+      },
+      connection,
+      adapter: this
+    } as CallHierarchyWithAdapter<'outgoing'>
+  }
+}
 
-  /**
-   * Public: Convert an individual {SymbolInformation} from the language server to an {OutlineTree} for use by the Outline View.
-   *
-   * @param symbol The {SymbolInformation} to convert to an {OutlineTree}.
-   * @returns The {OutlineTree} equivalent to the given {SymbolInformation}.
-   */
-  /*public static symbolToOutline(
-    symbol: SymbolInformation,
-  ): atomIde.OutlineTree {
-    const icon = OutlineViewAdapter.symbolKindToEntityKind(symbol.kind);
-    return {
-      tokenizedText: [
-        {
-          kind: OutlineViewAdapter.symbolKindToTokenKind(symbol.kind),
-          value: symbol.name,
-        },
-      ],
-      icon: icon != null ? icon : undefined,
-      representativeName: symbol.name,
-      startPosition: Convert.positionToPoint(symbol.location.range.start),
-      endPosition: Convert.positionToPoint(symbol.location.range.end),
-      children: [],
-    };
-  }*/
+function parseCallHierarchyItem(rawData:lsp.CallHierarchyItem):CallHierarchyItemWithAdapter {
+  return {
+    path: Convert.uriToPath(rawData.uri),
+    name: rawData.name,
+    icon:  OutlineViewAdapter.symbolKindToEntityKind(rawData.kind),
+    //tags?: SymbolTag[]; <- isDeprecated?1:0
+    detail: rawData.detail,
+    range: Convert.lsRangeToAtomRange(rawData.range),
+    selectionRange: Convert.lsRangeToAtomRange(rawData.selectionRange),
+    rawData
+  }
+}
+
+interface CallHierarchyWithAdapter<T extends "incoming" | "outgoing"> extends CallHierarchy<T> {
+  data: CallHierarchyItemWithAdapter[];
+  adapter: CallHierarchyAdapter;
+  connection: LanguageClientConnection;
+}
+
+interface CallHierarchyItemWithAdapter extends CallHierarchyItem {
+  rawData: lsp.CallHierarchyItem
 }
