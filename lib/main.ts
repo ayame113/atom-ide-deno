@@ -250,6 +250,7 @@ class DenoLanguageClient extends AutoLanguageClient {
   consumeStatusBar(statusBar: StatusBar) {
     autoConfig.consumeStatusBar(statusBar);
   }
+  // CallHierarchy===========
   callHierarchy?: CallHierarchyAdapter;
   provideCallHierarchy(): CallHierarchyProvider {
     return {

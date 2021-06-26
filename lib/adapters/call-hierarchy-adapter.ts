@@ -1,4 +1,4 @@
-import { Convert } from "atom-languageclient";
+import Convert from "atom-languageclient/build/lib/convert";
 import * as Utils from "atom-languageclient/build/lib/utils";
 import type { CancellationTokenSource } from "vscode-jsonrpc";
 import type {
@@ -10,7 +10,7 @@ import type { Point, TextEditor } from "atom";
 import OutlineViewAdapter from 'atom-languageclient/build/lib/adapters/outline-view-adapter'
 
 import * as lsp from "vscode-languageserver-protocol";
-import type { CallHierarchy, CallHierarchyItem } from "./call-hierarchy";
+import type { CallHierarchy, CallHierarchyItem, CallHierarchyType } from "./call-hierarchy";
 
 /** Public: Adapts the documentSymbolProvider of the language server to the Outline View supplied by Atom IDE UI. */
 export default class CallHierarchyAdapter {
@@ -30,7 +30,7 @@ export default class CallHierarchyAdapter {
     return !!serverCapabilities.callHierarchyProvider;
   }
 
-  async getCallHierarchy<T extends "incoming" | "outgoing">(
+  async getCallHierarchy<T extends CallHierarchyType>(
     connection: LanguageClientConnection,
     editor: TextEditor,
     point: Point,
@@ -126,7 +126,7 @@ function parseCallHierarchyItem(rawData:lsp.CallHierarchyItem):CallHierarchyItem
   }
 }
 
-interface CallHierarchyWithAdapter<T extends "incoming" | "outgoing"> extends CallHierarchy<T> {
+interface CallHierarchyWithAdapter<T extends CallHierarchyType> extends CallHierarchy<T> {
   data: CallHierarchyItemWithAdapter[];
   adapter: CallHierarchyAdapter;
   connection: LanguageClientConnection;

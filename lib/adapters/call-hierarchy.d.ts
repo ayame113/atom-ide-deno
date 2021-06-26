@@ -1,6 +1,8 @@
 import * as Atom from "atom";
 import type { IdeUri } from "atom-ide-base/types-packages/uri";
 
+export type CallHierarchyType = "incoming" | "outgoing";
+
 export interface CallHierarchyProvider {
   name: string;
   priority: number;
@@ -15,7 +17,7 @@ export interface CallHierarchyProvider {
   ): Promise<CallHierarchy<"outgoing"> | null>;
 }
 
-interface CallHierarchy<T extends "incoming" | "outgoing"> {
+interface CallHierarchy<T extends CallHierarchyType> {
   type: T;
   data: CallHierarchyItem[];
   itemAt(i: number): Promise<CallHierarchy<T>>;
