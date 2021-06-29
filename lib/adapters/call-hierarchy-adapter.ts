@@ -1,5 +1,6 @@
 import Convert from "atom-languageclient/build/lib/convert";
 import * as Utils from "atom-languageclient/build/lib/utils";
+import { SymbolTag } from "atom-languageclient/build/lib/languageclient";
 import type { CancellationTokenSource } from "vscode-jsonrpc";
 import type {
   LanguageClientConnection,
@@ -14,6 +15,7 @@ import type {
   CallHierarchy,
   CallHierarchyItem,
   CallHierarchyType,
+  SymbolTagKind,
 } from "./call-hierarchy";
 
 /** Public: Adapts the documentSymbolProvider of the language server to the Outline View supplied by Atom IDE UI. */
@@ -136,12 +138,27 @@ function parseCallHierarchyItem(
     path: Convert.uriToPath(rawData.uri),
     name: rawData.name,
     icon: OutlineViewAdapter.symbolKindToEntityKind(rawData.kind),
-    //tags?: SymbolTag[]; <- isDeprecated?1:0
+    tags: rawData.tags
+      ? [...rawData.tags.reduce((set, tag) => {
+        // filter out null and remove duplicates
+        const entity = symbolTagToEntityKind(tag);
+        return entity == null ? set : set.add(entity);
+      }, new Set<SymbolTagKind>())]
+      : [],
     detail: rawData.detail,
     range: Convert.lsRangeToAtomRange(rawData.range),
     selectionRange: Convert.lsRangeToAtomRange(rawData.selectionRange),
     rawData,
   };
+}
+
+function symbolTagToEntityKind(symbol: number): SymbolTagKind | null {
+  switch (symbol) {
+    case SymbolTag.Deprecated:
+      return "deprecated";
+    default:
+      return null;
+  }
 }
 
 interface CallHierarchyWithAdapter<T extends CallHierarchyType>

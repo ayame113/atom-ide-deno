@@ -27,8 +27,14 @@ interface CallHierarchyItem {
   path: IdeUri;
   name: string;
   icon: string | null;
-  //tags?: SymbolTag[]; <- isDeprecated=1
+  tags: SymbolTagKind[];
   detail?: string;
   range: Atom.Range;
   selectionRange: Atom.Range;
 }
+
+/**
+ * Kind of symbol tag - matches the names from the Language Server Protocol.
+ * LSP specification: https://microsoft.github.io/language-server-protocol/specifications/specification-current/#symbolTag
+ */
+export type SymbolTagKind = "deprecated"; // currently no other type
