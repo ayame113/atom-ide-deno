@@ -122,7 +122,10 @@ function changeMode() {
     }
     if (isEslintEnable) {
       // TODO: # I'll leave the code of activation for those who encountered in #44, but remove it after some time.
-      await atom.commands.dispatch((atom.workspace as any).getElement(),"linter:enable-linter");
+      await atom.commands.dispatch(
+        (atom.workspace as any).getElement(),
+        "linter:enable-linter",
+      );
       const selectListViewItem = atom.workspace.getModalPanels().filter((v) =>
         v.isVisible() && v.getItem().constructor.name == "SelectListView"
       )[0]?.getItem() as SelectListView;
