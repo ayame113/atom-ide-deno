@@ -352,13 +352,6 @@ export const config: atomConfig = {
     type: "object",
     order: 4,
     properties: {
-      linterOnly: {
-        title: "Linter only",
-        description: "When enabled, features other than linter are ignored.",
-        type: "boolean",
-        default: false,
-        order: 1,
-      },
       debugMode: {
         title: "debug mode",
         description: "Output log to console (ctrl+shift+i)",
