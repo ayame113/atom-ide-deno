@@ -30,13 +30,13 @@ export function formatFile(
   filePath: string,
 ): Promise<{ error: Error | null; stdout: string; stderr: string }> {
   const commandOption = ["fmt", ...options, filePath];
-  console.log("env: ", process.env);
-  console.log(denoPath, ...commandOption);
+  // console.log("env: ", process.env);
+  // console.log(denoPath, ...commandOption);
   return new Promise((resolve) => {
     cp.execFile(denoPath, commandOption, {
       env: process.env,
     }, (error, stdout, stderr) => {
-      console.log({ error, stdout, stderr });
+      // console.log({ error, stdout, stderr });
       resolve({ error, stdout, stderr });
     });
   });

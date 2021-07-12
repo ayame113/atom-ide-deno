@@ -1,7 +1,6 @@
 import { config, keyboardInputsKeyPath } from "./config";
 import type { atomConfig } from "./config";
 import * as formatter from "./formatter";
-import { addLinterOnlyMode } from "./linter_only";
 import * as autoConfig from "./auto_config";
 import { menu } from "../menus/main.json";
 
@@ -25,7 +24,7 @@ import path from "path";
 
 // to call hierarchy
 import CallHierarchyAdapter from "./adapters/call-hierarchy-adapter";
-import type { CallHierarchyProvider } from "./adapters/call-hierarchy";
+import type { CallHierarchyProvider, CallHierarchy } from "./adapters/call-hierarchy";
 
 const getDenoPath = (): string =>
   atom.config.get("atom-ide-deno.path") || "deno";
@@ -225,7 +224,7 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   async formatAll() {
     for (const projectPath of atom.project.getPaths()) {
-      console.log(`format: ${projectPath}`);
+      // console.log(`format: ${projectPath}`);
       const { stderr } = await formatter.formatFile(
         getDenoPath(),
         [
@@ -242,11 +241,7 @@ class DenoLanguageClient extends AutoLanguageClient {
       });
     }
   }
-  // DenoMode / NodeMode
-  _linterOnly = false;
-  setLinterOnlyMode(v: boolean) {
-    this._linterOnly = v;
-  }
+  // TODO: should return disposable?
   consumeStatusBar(statusBar: StatusBar) {
     autoConfig.consumeStatusBar(statusBar);
   }
@@ -261,7 +256,7 @@ class DenoLanguageClient extends AutoLanguageClient {
       getOutgoingCallHierarchy: this.getOutgoingCallHierarchy.bind(this),
     };
   }
-  async getIncomingCallHierarchy(editor: TextEditor, point: Point) {
+  async getIncomingCallHierarchy(editor: TextEditor, point: Point): Promise<CallHierarchy<"incoming"> | null> {
     // TODO: remove any
     const server = await ((this as any)._serverManager as ServerManager)
       .getServer(editor);
@@ -276,7 +271,7 @@ class DenoLanguageClient extends AutoLanguageClient {
       "incoming",
     );
   }
-  async getOutgoingCallHierarchy(editor: TextEditor, point: Point) {
+  async getOutgoingCallHierarchy(editor: TextEditor, point: Point): Promise<CallHierarchy<"outgoing"> | null> {
     // TODO: remove any
     const server = await ((this as any)._serverManager as ServerManager)
       .getServer(editor);
@@ -293,7 +288,7 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
 }
 
-export default addLinterOnlyMode(new DenoLanguageClient());
+export default new DenoLanguageClient();
 function onActivate(denoLS: DenoLanguageClient) {
   //config変更時にlspを再起動
   //文字列の入力途中でfile not foundエラーが出るため、2秒間間引く
@@ -302,7 +297,7 @@ function onActivate(denoLS: DenoLanguageClient) {
     { oldValue = {}, newValue }: { oldValue?: any; newValue: any },
     keyPathbase: string[],
   ) {
-    console.log("atom-ide-deno config change caught");
+    // console.log("atom-ide-deno config change caught");
     clearTimeout(inputTimeoutId);
     let isDefferRestart = false;
     //keyboardInputsKeyPathに含まれるキーの値が変更されていれば、実行を延期（間引く）
@@ -343,9 +338,6 @@ function onActivate(denoLS: DenoLanguageClient) {
     ),
     atom.config.observe("atom-ide-deno.advanced.debugMode", (newValue) => {
       denoLS.setDebugMode(newValue);
-    }),
-    atom.config.observe("atom-ide-deno.advanced.linterOnly", (newValue) => {
-      denoLS.setLinterOnlyMode(newValue);
     }),
     //virtual documentを表示
     atom.workspace.addOpener((filePath) => {
@@ -448,7 +440,7 @@ function onActivate(denoLS: DenoLanguageClient) {
       denoLS.subscriptions?.add(
         editor.onDidSave(({ path }) => {
           if (!atom.config.get("atom-ide-deno.format.onSave.enable")) {
-            console.log(`ignored format(disabled): ${path}`);
+            // console.log(`ignored format(disabled): ${path}`);
             return;
           }
           if (
@@ -458,10 +450,10 @@ function onActivate(denoLS: DenoLanguageClient) {
               }`,
             )
           ) {
-            console.log(`ignored format(exclude extension): ${path}`);
+            // console.log(`ignored format(exclude extension): ${path}`);
             return;
           }
-          console.log(`format: ${path}`);
+          // console.log(`format: ${path}`);
           formatter.formatFile(getDenoPath(), [], path);
         }),
       );

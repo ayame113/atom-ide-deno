@@ -79,7 +79,7 @@ function changeMode() {
     return;
   }
   const newMode: modes = atom.config.get("atom-ide-deno.modes.currentMode");
-  console.log(`Mode change to ${newMode}`);
+  // console.log(`Mode change to ${newMode}`);
   if (newMode == "deno") {
     statusBarElement.innerText = "Deno";
     statusBarElement.classList.remove("status-bar-icon-node");
@@ -90,18 +90,16 @@ function changeMode() {
     statusBarElement.classList.add("status-bar-icon-node");
   }
   //設定変更
-  //deno lsp: linterOnlyモード+lint:false->なにも行わない
+  //deno lsp: enable:false+lint:false->なにも行わない
   if (newMode == "deno") {
     //atom.packages.enablePackage('atom-ide-deno')
     atom.config.set("atom-ide-deno.lspFlags.enable", true);
-    atom.config.set("atom-ide-deno.advanced.linterOnly", false);
     atom.packages.disablePackage("atom-ide-javascript");
     atom.packages.disablePackage("atom-typescript");
     atom.packages.disablePackage("javascript-drag-import");
   } else {
     //atom.packages.disablePackage('atom-ide-deno')
-    atom.config.set("atom-ide-deno.lspFlags.enable", true);
-    atom.config.set("atom-ide-deno.advanced.linterOnly", true);
+    atom.config.set("atom-ide-deno.lspFlags.enable", false);
     atom.packages.enablePackage("atom-ide-javascript");
     atom.packages.enablePackage("atom-typescript");
     atom.packages.enablePackage("javascript-drag-import");
@@ -116,6 +114,7 @@ function changeMode() {
     atom.config.set("atom-ide-deno.lspFlags.lint", isDenoLintEnable);
     // eslint
     const isEslintEnable = linter == "eslint";
+    // TODO: remove this logic and deactivate the entire package
     await atom.commands.dispatch(
       (atom.workspace as any).getElement(),
       isEslintEnable ? "linter:enable-linter" : "linter:disable-linter",
