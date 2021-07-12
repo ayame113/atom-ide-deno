@@ -96,7 +96,7 @@ export const config: atomConfig = {
         description:
           `You can customize the configuration used when you select Deno mode.
           When you select Deno mode, the following settings apply:
-          • Atom-ide-deno (package for Deno runtime): Enable (and then disable the \`Linter Only\` setting)
+          • Atom-ide-deno (package for Deno runtime): Enable
           • Atom-ide-javascript (package for Node.js runtime): Disable
           • Atom-typescript (package for Node.js runtime): Disable
           • Javascript-drag-import (package for Node.js runtime): Disable`,
@@ -107,7 +107,7 @@ export const config: atomConfig = {
             title: "Linter",
             description:
               `• \`deno lint\`: Use the built-in linter from the deno language server. Add ESLint to the \`Disabled provider\` setting in the \`Linter\` package.
-              • \`eslint\`: Remove ESLint from the \`Disabled provider\` setting in the \`Linter\` package. Disable the built-in deno linter.
+              • \`eslint\`: Enable the \`linter-eslint\` package if it is installed. Disable the built-in deno linter.
               • \`disable both\`: Disables both \`deno lint\` and \`eslint\`.`,
             type: "string",
             default: "deno lint",
@@ -132,7 +132,7 @@ export const config: atomConfig = {
         description:
           `You can customize the configuration used when you select Node.js mode.
         When you select Node.js mode, the following settings apply:
-        • Atom-ide-deno (package for Deno runtime): Enable (and then enable the \`Linter Only\` setting)
+        • Atom-ide-deno (package for Deno runtime): Disable
         • Atom-ide-javascript (package for Node.js runtime): Enable
         • Atom-typescript (package for Node.js runtime): Enable
         • Javascript-drag-import (package for Node.js runtime): Enable`,
