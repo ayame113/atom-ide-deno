@@ -114,26 +114,34 @@ function changeMode() {
     atom.config.set("atom-ide-deno.lspFlags.lint", isDenoLintEnable);
     // eslint
     const isEslintEnable = linter == "eslint";
-    // TODO: remove this logic and deactivate the entire package
-    await atom.commands.dispatch(
-      (atom.workspace as any).getElement(),
-      isEslintEnable ? "linter:enable-linter" : "linter:disable-linter",
-    );
-    const selectListViewItem = atom.workspace.getModalPanels().filter((v) =>
-      v.isVisible() && v.getItem().constructor.name == "SelectListView"
-    )[0]?.getItem() as SelectListView;
-    try {
-      await selectListViewItem?.selectItem("ESLint");
-      selectListViewItem?.confirmSelection();
-    } catch (_) {
-      selectListViewItem.cancelSelection();
+    // Disabling the entire package can lead to unexpected bugs, but it's better than having problems like https://github.com/ayame113/atom-ide-deno/issues/44.
+    if (isEslintEnable) {
+      atom.packages.enablePackage("linter-eslint");
+    } else {
+      atom.packages.disablePackage("linter-eslint");
     }
-    try {
+    if (isEslintEnable) {
+      // TODO: # I'll leave the code of activation for those who encountered in #44, but remove it after some time.
       await atom.commands.dispatch(
-        (atom.workspace.getActiveTextEditor() as any).getElement(),
-        "linter:lint",
+        (atom.workspace as any).getElement(),
+        "linter:enable-linter",
       );
-    } catch (_) {}
+      const selectListViewItem = atom.workspace.getModalPanels().filter((v) =>
+        v.isVisible() && v.getItem().constructor.name == "SelectListView"
+      )[0]?.getItem() as SelectListView;
+      try {
+        await selectListViewItem?.selectItem("ESLint");
+        selectListViewItem?.confirmSelection();
+      } catch (_) {
+        selectListViewItem.cancelSelection();
+      }
+      try {
+        await atom.commands.dispatch(
+          (atom.workspace.getActiveTextEditor() as any).getElement(),
+          "linter:lint",
+        );
+      } catch (_) {}
+    }
   })();
   // formatter
   {
