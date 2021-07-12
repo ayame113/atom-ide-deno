@@ -171,5 +171,5 @@ function changeMode() {
 export function deactivate() {
   statusBarTile.destroy();
   subscriptions.dispose();
-  tooltip.dispose();
+  tooltip?.dispose();
 }

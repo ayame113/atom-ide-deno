@@ -23,6 +23,10 @@ import type { TextDocumentIdentifier } from "vscode-languageserver-protocol";
 import cp from "child_process";
 import path from "path";
 
+// to call hierarchy
+import CallHierarchyAdapter from "./adapters/call-hierarchy-adapter";
+import type { CallHierarchyProvider } from "./adapters/call-hierarchy";
+
 const getDenoPath = (): string =>
   atom.config.get("atom-ide-deno.path") || "deno";
 
@@ -245,6 +249,47 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   consumeStatusBar(statusBar: StatusBar) {
     autoConfig.consumeStatusBar(statusBar);
+  }
+  // CallHierarchy===========
+  callHierarchy?: CallHierarchyAdapter;
+  provideCallHierarchy(): CallHierarchyProvider {
+    return {
+      name: this.name,
+      grammarScopes: this.getGrammarScopes(),
+      priority: 1,
+      getIncomingCallHierarchy: this.getIncomingCallHierarchy.bind(this),
+      getOutgoingCallHierarchy: this.getOutgoingCallHierarchy.bind(this),
+    };
+  }
+  async getIncomingCallHierarchy(editor: TextEditor, point: Point) {
+    // TODO: remove any
+    const server = await ((this as any)._serverManager as ServerManager)
+      .getServer(editor);
+    if (server == null || !CallHierarchyAdapter.canAdapt(server.capabilities)) {
+      return null;
+    }
+    this.callHierarchy = this.callHierarchy || new CallHierarchyAdapter();
+    return this.callHierarchy.getCallHierarchy(
+      server.connection,
+      editor,
+      point,
+      "incoming",
+    );
+  }
+  async getOutgoingCallHierarchy(editor: TextEditor, point: Point) {
+    // TODO: remove any
+    const server = await ((this as any)._serverManager as ServerManager)
+      .getServer(editor);
+    if (server == null || !CallHierarchyAdapter.canAdapt(server.capabilities)) {
+      return null;
+    }
+    this.callHierarchy = this.callHierarchy || new CallHierarchyAdapter();
+    return this.callHierarchy.getCallHierarchy(
+      server.connection,
+      editor,
+      point,
+      "outgoing",
+    );
   }
 }
 
