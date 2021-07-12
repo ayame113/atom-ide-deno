@@ -24,7 +24,10 @@ import path from "path";
 
 // to call hierarchy
 import CallHierarchyAdapter from "./adapters/call-hierarchy-adapter";
-import type { CallHierarchyProvider, CallHierarchy } from "./adapters/call-hierarchy";
+import type {
+  CallHierarchy,
+  CallHierarchyProvider,
+} from "./adapters/call-hierarchy";
 
 const getDenoPath = (): string =>
   atom.config.get("atom-ide-deno.path") || "deno";
@@ -256,7 +259,10 @@ class DenoLanguageClient extends AutoLanguageClient {
       getOutgoingCallHierarchy: this.getOutgoingCallHierarchy.bind(this),
     };
   }
-  async getIncomingCallHierarchy(editor: TextEditor, point: Point): Promise<CallHierarchy<"incoming"> | null> {
+  async getIncomingCallHierarchy(
+    editor: TextEditor,
+    point: Point,
+  ): Promise<CallHierarchy<"incoming"> | null> {
     // TODO: remove any
     const server = await ((this as any)._serverManager as ServerManager)
       .getServer(editor);
@@ -271,7 +277,10 @@ class DenoLanguageClient extends AutoLanguageClient {
       "incoming",
     );
   }
-  async getOutgoingCallHierarchy(editor: TextEditor, point: Point): Promise<CallHierarchy<"outgoing"> | null> {
+  async getOutgoingCallHierarchy(
+    editor: TextEditor,
+    point: Point,
+  ): Promise<CallHierarchy<"outgoing"> | null> {
     // TODO: remove any
     const server = await ((this as any)._serverManager as ServerManager)
       .getServer(editor);
