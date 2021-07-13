@@ -37,10 +37,8 @@ class DenoLanguageClient extends AutoLanguageClient {
   _isDebug!: boolean;
   _emptyConnection!: LanguageClientConnection;
   subscriptions!: CompositeDisposable;
-  //isDebug=true時に再起動
   async setDebugMode(isDebug: boolean) {
     this._isDebug = isDebug;
-    await this.restartAllServers();
   }
   debugLog(...msg: any[]) {
     if (this._isDebug) {
@@ -91,6 +89,9 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   activate() {
     this.debugLog("activating...");
+    import("atom-package-deps").then((mod) =>
+      mod.install("atom-ide-deno", true)
+    );
     super.activate();
     this.subscriptions = new CompositeDisposable();
     onActivate(this);
