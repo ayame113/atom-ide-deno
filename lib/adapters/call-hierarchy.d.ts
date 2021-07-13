@@ -26,7 +26,7 @@ interface CallHierarchy<T extends CallHierarchyType> {
 interface CallHierarchyItem {
   path: IdeUri;
   name: string;
-  icon: string | null;
+  icon?: string;
   tags: SymbolTagKind[];
   detail?: string;
   range: Atom.Range;
