@@ -37,10 +37,8 @@ class DenoLanguageClient extends AutoLanguageClient {
   _isDebug!: boolean;
   _emptyConnection!: LanguageClientConnection;
   subscriptions!: CompositeDisposable;
-  //isDebug=true時に再起動
   async setDebugMode(isDebug: boolean) {
     this._isDebug = isDebug;
-    await this.restartAllServers();
   }
   debugLog(...msg: any[]) {
     if (this._isDebug) {
