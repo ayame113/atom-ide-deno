@@ -15,6 +15,12 @@
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
+  "activationHooks": [
+    "language-typescript:grammar-used",
+    "language-javascript:grammar-used",
+    "language-json:grammar-used",
+    "language-gfm:grammar-used"
+  ],
   "scripts": {
     "check": "tsc --noEmit  -p ./lib/tsconfig.json",
     "format": "deno fmt --ignore=./node_modules",
