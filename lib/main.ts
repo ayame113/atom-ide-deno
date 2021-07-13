@@ -91,6 +91,7 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   activate() {
     this.debugLog("activating...");
+    import("atom-package-deps").then(mod=>mod.install("atom-ide-deno", true))
     super.activate();
     this.subscriptions = new CompositeDisposable();
     onActivate(this);

@@ -21,6 +21,9 @@
     "language-json:grammar-used",
     "language-gfm:grammar-used"
   ],
+  "package-deps": [
+    "atom-ide-base"
+  ],
   "scripts": {
     "check": "tsc --noEmit  -p ./lib/tsconfig.json",
     "format": "deno fmt --ignore=./node_modules",
@@ -31,6 +34,7 @@
   },
   "dependencies": {
     "atom-languageclient": "^1.14.0",
+    "atom-package-deps": "^7.2.3",
     "atom-ts-transpiler": "^1.5.3",
     "typescript": "~4.3.4"
   },
