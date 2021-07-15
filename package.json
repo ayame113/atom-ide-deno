@@ -33,7 +33,7 @@
     "test": "atom --test spec"
   },
   "dependencies": {
-    "atom-languageclient": "^1.14.0",
+    "atom-languageclient": "^1.14.1",
     "atom-package-deps": "^7.2.3",
     "atom-ts-transpiler": "^1.5.3",
     "typescript": "~4.3.4"
@@ -150,7 +150,7 @@
     },
     "call-hierarchy": {
       "versions": {
-        "0.0.0": "provideCallHierarchy"
+        "0.1.0": "provideCallHierarchy"
       }
     }
   }
