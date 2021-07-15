@@ -150,7 +150,7 @@
     },
     "call-hierarchy": {
       "versions": {
-        "0.0.0": "provideCallHierarchy"
+        "0.1.0": "provideCallHierarchy"
       }
     }
   }
