@@ -1,3 +1,5 @@
+See the [github release page](https://github.com/ayame113/atom-ide-deno/releases) for future releases.
+
 ## 1.8.0
 - Update dependencies (#43)
 
