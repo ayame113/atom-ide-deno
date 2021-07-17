@@ -1,6 +1,6 @@
 // using custom formatter
-// atom-ide-ui(old package) has meny bug at formatting.
 import cp from "child_process";
+import { logger } from "./logger";
 
 export const options = {
   check: "--check",
@@ -30,13 +30,13 @@ export function formatFile(
   filePath: string,
 ): Promise<{ error: Error | null; stdout: string; stderr: string }> {
   const commandOption = ["fmt", ...options, filePath];
-  // console.log("env: ", process.env);
-  // console.log(denoPath, ...commandOption);
+  logger.log("env: ", process.env);
+  logger.log(denoPath, ...commandOption);
   return new Promise((resolve) => {
     cp.execFile(denoPath, commandOption, {
       env: process.env,
     }, (error, stdout, stderr) => {
-      // console.log({ error, stdout, stderr });
+      logger.log({ error, stdout, stderr });
       resolve({ error, stdout, stderr });
     });
   });
