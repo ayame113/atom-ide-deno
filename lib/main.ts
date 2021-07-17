@@ -53,7 +53,7 @@ class DenoLanguageClient extends AutoLanguageClient {
       "source.tsx",
       "JavaScript",
       "TypeScript",
-      //'source.gfm', <-not supported at deno lsp
+      "source.gfm",
       "source.json",
     ];
   }
@@ -445,28 +445,5 @@ function onActivate(denoLS: DenoLanguageClient) {
           ]),
       ),
     ),
-    // save on format
-    atom.workspace.observeTextEditors((editor) => {
-      denoLS.subscriptions?.add(
-        editor.onDidSave(({ path }) => {
-          if (!atom.config.get("atom-ide-deno.format.onSave.enable")) {
-            // console.log(`ignored format(disabled): ${path}`);
-            return;
-          }
-          if (
-            !atom.config.get(
-              `atom-ide-deno.format.onSave.extensions.${
-                editor.getGrammar().scopeName.replace(/\./g, "_")
-              }`,
-            )
-          ) {
-            // console.log(`ignored format(exclude extension): ${path}`);
-            return;
-          }
-          // console.log(`format: ${path}`);
-          formatter.formatFile(getDenoPath(), [], path);
-        }),
-      );
-    }),
   );
 }
