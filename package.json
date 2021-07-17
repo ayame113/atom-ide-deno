@@ -106,24 +106,24 @@
         "0.1.0": "provideFindReferences"
       }
     },
-    "__code-format.range": {
+    "code-format.range": {
       "versions": {
         "0.1.0": "provideRangeCodeFormat"
       }
     },
-    "__code-format.file": {
+    "code-format.file": {
       "versions": {
         "0.1.0": "provideFileCodeFormat"
       }
     },
-    "__code-format.onSave": {
-      "versions": {
-        "0.1.0": "provideOnSaveCodeFormat"
-      }
-    },
-    "__code-format.onType": {
+    "code-format.onType": {
       "versions": {
         "0.1.0": "provideOnTypeCodeFormat"
+      }
+    },
+    "code-format.onSave": {
+      "versions": {
+        "0.1.0": "provideOnSaveCodeFormat"
       }
     },
     "code-highlight": {
