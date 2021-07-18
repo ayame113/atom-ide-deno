@@ -5,10 +5,7 @@ import * as autoConfig from "./auto_config";
 import { menu } from "../menus/main.json";
 import { logger } from "./logger";
 
-import {
-  AutoLanguageClient,
-  Convert,
-} from "atom-languageclient";
+import { AutoLanguageClient, Convert } from "atom-languageclient";
 import type {
   ActiveServer,
   LanguageClientConnection,
@@ -101,7 +98,7 @@ class DenoLanguageClient extends AutoLanguageClient {
     return super.restartAllServers(...args);
   }
   getLogger(): Logger {
-    return logger
+    return logger;
   }
   async getDefinition(...args: [TextEditor, Point]) {
     const res = await super.getDefinition(...args);
