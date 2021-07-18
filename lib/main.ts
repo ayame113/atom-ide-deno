@@ -3,16 +3,14 @@ import type { atomConfig } from "./config";
 import * as formatter from "./formatter";
 import * as autoConfig from "./auto_config";
 import { menu } from "../menus/main.json";
+import { logger } from "./logger";
 
-import {
-  AutoLanguageClient,
-  Convert,
-  FilteredLogger,
-} from "atom-languageclient";
+import { AutoLanguageClient, Convert } from "atom-languageclient";
 import type {
   ActiveServer,
   LanguageClientConnection,
   LanguageServerProcess,
+  Logger,
 } from "atom-languageclient";
 import type { ServerManager } from "atom-languageclient/lib/server-manager";
 import type { Point } from "atom";
@@ -34,17 +32,8 @@ const getDenoPath = (): string =>
 
 class DenoLanguageClient extends AutoLanguageClient {
   config: atomConfig = config;
-  _isDebug!: boolean;
   _emptyConnection!: LanguageClientConnection;
   subscriptions!: CompositeDisposable;
-  async setDebugMode(isDebug: boolean) {
-    this._isDebug = isDebug;
-  }
-  debugLog(...msg: any[]) {
-    if (this._isDebug) {
-      console.trace(...msg);
-    }
-  }
   getGrammarScopes() {
     return [
       "source.js",
@@ -64,7 +53,7 @@ class DenoLanguageClient extends AutoLanguageClient {
     return "deno-language-server";
   }
   getInitializeParams(...args: [string, LanguageServerProcess]) {
-    this.debugLog("initializing...");
+    logger.log("initializing...");
     const initializationOptions = atom.config.get("atom-ide-deno.lspFlags");
     //filter empty string
     initializationOptions.importMap = initializationOptions.importMap || void 0;
@@ -80,7 +69,7 @@ class DenoLanguageClient extends AutoLanguageClient {
     } catch (e) {
       console.log(e);
     }
-    this.debugLog(initializationOptions);
+    logger.log(initializationOptions);
     //https://github.com/denoland/deno/pull/8850
     //enableフラグが必要
     return Object.assign(super.getInitializeParams(...args), {
@@ -88,7 +77,7 @@ class DenoLanguageClient extends AutoLanguageClient {
     });
   }
   activate() {
-    this.debugLog("activating...");
+    logger.log("activating...");
     import("atom-package-deps").then((mod) =>
       mod.install("atom-ide-deno", true)
     );
@@ -98,25 +87,22 @@ class DenoLanguageClient extends AutoLanguageClient {
     autoConfig.activate({ grammarScopes: this.getGrammarScopes() });
   }
   async deactivate() {
-    this.debugLog("deactivating...");
+    logger.log("deactivating...");
     autoConfig.deactivate();
     await super.deactivate();
     this.subscriptions?.dispose();
   }
   restartAllServers(...args: []) {
-    this.debugLog("restart Deno Language server");
+    logger.log("restart Deno Language server");
     atom.notifications.addInfo("restart Deno Language server");
     return super.restartAllServers(...args);
   }
-  getLogger() {
-    return new FilteredLogger(
-      console,
-      (lebel) => this._isDebug || ["warn", "error"].includes(lebel),
-    );
+  getLogger(): Logger {
+    return logger;
   }
   async getDefinition(...args: [TextEditor, Point]) {
     const res = await super.getDefinition(...args);
-    this.debugLog(res);
+    logger.log(res);
     if (res == null) return null;
     const { definitions, ...others } = res;
     // `deno:/` から始まるカスタムリクエストは相対パスとして解釈されてしまう
@@ -137,7 +123,7 @@ class DenoLanguageClient extends AutoLanguageClient {
     };
   }
   startServerProcess(_projectPath: string) {
-    console.log("Starting deno language server");
+    logger.log("Starting deno language server");
     return cp.spawn(getDenoPath(), ["lsp"], { env: process.env });
   }
   //custom request util
@@ -228,7 +214,7 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   async formatAll() {
     for (const projectPath of atom.project.getPaths()) {
-      // console.log(`format: ${projectPath}`);
+      logger.log(`format: ${projectPath}`);
       const { stderr } = await formatter.formatFile(
         getDenoPath(),
         [
@@ -307,7 +293,7 @@ function onActivate(denoLS: DenoLanguageClient) {
     { oldValue = {}, newValue }: { oldValue?: any; newValue: any },
     keyPathbase: string[],
   ) {
-    // console.log("atom-ide-deno config change caught");
+    logger.log("atom-ide-deno config change caught");
     clearTimeout(inputTimeoutId);
     let isDefferRestart = false;
     //keyboardInputsKeyPathに含まれるキーの値が変更されていれば、実行を延期（間引く）
@@ -346,9 +332,7 @@ function onActivate(denoLS: DenoLanguageClient) {
       "atom-ide-deno.path",
       (v) => restartServer(v, ["path"]),
     ),
-    atom.config.observe("atom-ide-deno.advanced.debugMode", (newValue) => {
-      denoLS.setDebugMode(newValue);
-    }),
+    atom.config.observe("atom-ide-deno.advanced.debugMode", logger.observer),
     //virtual documentを表示
     atom.workspace.addOpener((filePath) => {
       if (!filePath.startsWith("deno://")) {

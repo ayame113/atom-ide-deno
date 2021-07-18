@@ -1,13 +1,7 @@
 import { CompositeDisposable, Disposable } from "atom";
+import { logger } from "./logger";
 import type { StatusBar, Tile } from "atom/status-bar";
-//https://github.com/atom/atom-select-list/pull/31
-//import {SelectListView} from "atom-select-list";
-
-interface SelectListView {
-  selectItem(item: Record<string, unknown> | string): Promise<void>;
-  confirmSelection(): void;
-  cancelSelection(): void;
-}
+import type SelectListView from "atom-select-list";
 
 type modes = "deno" | "node";
 let statusBarElement: HTMLAnchorElement;
@@ -79,7 +73,7 @@ function changeMode() {
     return;
   }
   const newMode: modes = atom.config.get("atom-ide-deno.modes.currentMode");
-  // console.log(`Mode change to ${newMode}`);
+  logger.log(`Mode change to ${newMode}`);
   if (newMode == "deno") {
     statusBarElement.innerText = "Deno";
     statusBarElement.classList.remove("status-bar-icon-node");
