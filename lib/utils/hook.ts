@@ -1,5 +1,6 @@
 /** Hook the argument value with {argumentsHook} and the return value with {returnHook} for the {property} of {target}. */
 export function addHookToObject<
+  // deno-lint-ignore no-explicit-any
   A extends Array<any>,
   R,
   P extends string | number | symbol,
@@ -22,13 +23,14 @@ export function addHookToObject<
 }
 
 /** Hook the argument value with {argumentsHook} and the return value with {returnHook} for the {originalFunction}. The value of {thisArg} is set to {this} of the {originalFunction}. */
+// deno-lint-ignore no-explicit-any
 export function addHook<A extends Array<any>, R>(
   originalFunction: (...args: A) => R,
   {
     argumentsHook,
     returnHook,
   }: FunctionHooks<A, R>,
-  thisArg?: any,
+  thisArg?: unknown,
 ): (...args: A) => R {
   return ((...args: A) => {
     const newArgs = argumentsHook ? argumentsHook(args) : args;

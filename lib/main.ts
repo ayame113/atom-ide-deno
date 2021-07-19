@@ -115,6 +115,7 @@ class DenoLanguageClient extends AutoLanguageClient {
     }
   }
   async getAnyConnection() {
+    // deno-lint-ignore no-explicit-any
     const activeServers = ((this as any)._serverManager as ServerManager)
       .getActiveServers();
     if (activeServers.length) {
@@ -123,6 +124,7 @@ class DenoLanguageClient extends AutoLanguageClient {
     //activeServerが空の場合、仮のconnectionを用意
     if (!this._emptyConnection) {
       this._emptyConnection =
+        // deno-lint-ignore no-explicit-any
         (await ((this as any).startServer("") as Promise<ActiveServer>))
           .connection;
       return this._emptyConnection;
@@ -131,14 +133,16 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   async sendCustomRequestForCurrentEditor(
     method: string,
-    params?: any[] | object,
+    // deno-lint-ignore no-explicit-any
+    params?: any[] | Record<string, any>,
   ) {
     return (await this.getCurrentConnection())?.sendCustomRequest(
       method,
       params,
     );
   }
-  async sendCustomRequestForAnyEditor(method: string, params?: any[] | object) {
+  // deno-lint-ignore no-explicit-any
+  async sendCustomRequestForAnyEditor(method: string, params?: any[] | Record<string, any>) {
     return (await this.getAnyConnection()).sendCustomRequest(method, params);
   }
   //custom request
@@ -230,6 +234,7 @@ class DenoLanguageClient extends AutoLanguageClient {
     point: Point,
   ): Promise<CallHierarchy<"incoming"> | null> {
     // TODO: remove any
+    // deno-lint-ignore no-explicit-any
     const server = await ((this as any)._serverManager as ServerManager)
       .getServer(editor);
     if (server == null || !CallHierarchyAdapter.canAdapt(server.capabilities)) {
@@ -248,6 +253,7 @@ class DenoLanguageClient extends AutoLanguageClient {
     point: Point,
   ): Promise<CallHierarchy<"outgoing"> | null> {
     // TODO: remove any
+    // deno-lint-ignore no-explicit-any
     const server = await ((this as any)._serverManager as ServerManager)
       .getServer(editor);
     if (server == null || !CallHierarchyAdapter.canAdapt(server.capabilities)) {
@@ -277,6 +283,7 @@ function onActivate(denoLS: DenoLanguageClient) {
   //文字列の入力途中でfile not foundエラーが出るため、2秒間間引く
   let inputTimeoutId: NodeJS.Timeout;
   function restartServer(
+    // deno-lint-ignore no-explicit-any
     { oldValue = {}, newValue }: { oldValue?: any; newValue: any },
     keyPathbase: string[],
   ) {
@@ -345,13 +352,14 @@ function onActivate(denoLS: DenoLanguageClient) {
       editor.getTitle = () => filePath;
       editor.getLongTitle = () => filePath;
       //保存を無効にする
-      // @ts-ignore
+      // @ts-ignore: no type
       editor.shouldPromptToSave = () => false;
       //閉じるボタンの表示を調整
       editor.isModified = () => false;
       editor.getBuffer().isModified = () => false;
       //pendingモードにする（次回開いたときに表示されないようにする）
       setTimeout((_) => {
+        // deno-lint-ignore no-explicit-any
         (atom.workspace.getActivePane() as any).setPendingItem(editor);
       }, 500);
       // defer execution until the content display is complete
@@ -363,11 +371,13 @@ function onActivate(denoLS: DenoLanguageClient) {
         "setCursorBufferPosition",
         "scrollToBufferPosition",
       ];
+      // deno-lint-ignore no-explicit-any
       const calledArgs: { [P in trapFunctionName]?: any[][] } = {};
-      const originalFunctions: { [P in trapFunctionName]?: Function } = {};
+      const originalFunctions: { [P in trapFunctionName]?: CallableFunction } = {};
       for (const funcName of trapFunctions) {
         calledArgs[funcName] = [];
         originalFunctions[funcName] = editor[funcName];
+        // deno-lint-ignore no-explicit-any
         editor[funcName] = (...args: any[]) => calledArgs[funcName]?.push(args);
       }
       (async () => {
@@ -375,7 +385,7 @@ function onActivate(denoLS: DenoLanguageClient) {
           uri: filePath,
         });
         try {
-          await editor.setText(doc, { bypassReadOnly: true });
+          editor.setText(doc, { bypassReadOnly: true });
         } catch {
           editor.setText(
             `// load was failed. (${filePath})`,
@@ -384,9 +394,9 @@ function onActivate(denoLS: DenoLanguageClient) {
         } finally {
           // execute deferred function
           for (const funcName of trapFunctions) {
-            // @ts-ignore
+            // @ts-ignore: hack
             editor[funcName] = originalFunctions[funcName];
-            // @ts-ignore
+            // @ts-ignore: hack
             calledArgs[funcName].forEach((args) => editor[funcName](...args));
           }
         }

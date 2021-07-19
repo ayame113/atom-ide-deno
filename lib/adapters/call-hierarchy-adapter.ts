@@ -51,8 +51,7 @@ export default class CallHierarchyAdapter {
       connection,
       this._cancellationTokens,
       (_cancellationToken) =>
-        //ignore private
-        // @ts-ignore
+        // @ts-ignore: ignore private
         connection._sendRequest(
           lsp.CallHierarchyPrepareRequest.type,
           requestParam,
@@ -88,8 +87,7 @@ export default class CallHierarchyAdapter {
       connection,
       this._cancellationTokens,
       (_cancellationToken) =>
-        //ignore private
-        // @ts-ignore
+        // @ts-ignore: ignore private
         connection._sendRequest(
           lsp.CallHierarchyIncomingCallsRequest.type,
           requestParam,
@@ -115,8 +113,7 @@ export default class CallHierarchyAdapter {
       connection,
       this._cancellationTokens,
       (_cancellationToken) =>
-        //ignore private
-        // @ts-ignore
+        // @ts-ignore: ignore private
         connection._sendRequest(
           lsp.CallHierarchyOutgoingCallsRequest.type,
           requestParam,

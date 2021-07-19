@@ -40,10 +40,11 @@ export function activate({ grammarScopes }: { grammarScopes: string[] }) {
       );
       changeMode();
     }),
-    atom.workspace.observeActiveTextEditor((editor: any) => {
+    atom.workspace.observeActiveTextEditor((editor) => {
       //js/tsと設定画面以外ではステータスバーを非表示
       if (
-        grammarScopes.includes(editor?.getGrammar?.()?.scopeName) ||
+        grammarScopes.includes(editor?.getGrammar().scopeName ?? "") ||
+        // deno-lint-ignore no-explicit-any
         atom.workspace.getPaneItems().some((e: any) =>
           e?.getURI?.() == "atom://config"
         )
@@ -117,6 +118,7 @@ function changeMode() {
     if (isEslintEnable) {
       // TODO: # I'll leave the code of activation for those who encountered in #44, but remove it after some time.
       await atom.commands.dispatch(
+        // deno-lint-ignore no-explicit-any
         (atom.workspace as any).getElement(),
         "linter:enable-linter",
       );
@@ -131,9 +133,11 @@ function changeMode() {
       }
       try {
         await atom.commands.dispatch(
+          // deno-lint-ignore no-explicit-any
           (atom.workspace.getActiveTextEditor() as any).getElement(),
           "linter:lint",
         );
+        // deno-lint-ignore no-empty
       } catch (_) {}
     }
   })();
