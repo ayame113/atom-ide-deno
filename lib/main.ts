@@ -334,7 +334,6 @@ function onActivate(denoLS: DenoLanguageClient) {
       );
       // パスの設定
       editor.getBuffer().getPath = () => filePath;
-      editor.getPath = () => filePath;
       // 保存時の「無効なパス」エラーを回避
       editor.save = () => Promise.resolve();
       editor.saveAs = () => Promise.resolve();
