@@ -12,27 +12,27 @@ class CustomLogger implements Logger {
     // 矢印関数なのでthisをbindする必要が無い
     this.#shouldOutput = newValue;
   };
-  warn(...args: any[]) {
+  warn(...args: unknown[]) {
     if (this.#shouldOutput) {
       console.warn(...args);
     }
   }
-  error(...args: any[]) {
+  error(...args: unknown[]) {
     if (this.#shouldOutput) {
       console.error(...args);
     }
   }
-  info(...args: any[]) {
+  info(...args: unknown[]) {
     if (this.#shouldOutput) {
       console.info(...args);
     }
   }
-  log(...args: any[]) {
+  log(...args: unknown[]) {
     if (this.#shouldOutput) {
       console.log(...args);
     }
   }
-  debug(...args: any[]) {
+  debug(...args: unknown[]) {
     if (this.#shouldOutput) {
       console.debug(...args);
     }

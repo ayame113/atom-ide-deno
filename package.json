@@ -25,11 +25,11 @@
     "atom-ide-base"
   ],
   "scripts": {
-    "check": "tsc --noEmit  -p ./lib/tsconfig.json",
+    "check": "tsc --noEmit -p ./lib/tsconfig.json",
     "format": "deno fmt --ignore=./node_modules",
     "test.format": "deno fmt --ignore=./node_modules --check",
-    "lint": "deno lint --ignore=./node_modules --unstable",
-    "test.lint": "deno lint --ignore=./node_modules --unstable | echo -e $(cat)",
+    "lint": "deno lint --ignore=./node_modules",
+    "test.lint": "deno lint --ignore=./node_modules",
     "test": "atom --test spec"
   },
   "dependencies": {

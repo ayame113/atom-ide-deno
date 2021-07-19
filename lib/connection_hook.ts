@@ -12,12 +12,14 @@ import { addHook, addHookToObject } from "./utils/hook";
 // Rewrite messages starting with `deno: /` to `deno-code: //`.
 // If this is not done, the path will be interpreted as a relative path and any error will occur.
 
+// deno-lint-ignore no-explicit-any
 function transStringInObject(arg: any, trans: (arg: string) => string): any {
   if (!arg) {
     return arg;
   } else if (typeof arg === "string") {
     return trans(arg);
   } else if (typeof arg === "object" && typeof arg.then === "function") {
+    // deno-lint-ignore no-explicit-any
     return arg.then((v: any) => transStringInObject(v, trans));
   } else if (Object.prototype.toString.call(arg) === "[object Object]") {
     return Object.fromEntries(
