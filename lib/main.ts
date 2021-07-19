@@ -26,6 +26,7 @@ import type {
   CallHierarchy,
   CallHierarchyProvider,
 } from "./adapters/call-hierarchy";
+import { addHookToConnection } from "./connection_hook";
 
 const getDenoPath = (): string =>
   atom.config.get("atom-ide-deno.path") || "deno";
@@ -99,28 +100,6 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   getLogger(): Logger {
     return logger;
-  }
-  async getDefinition(...args: [TextEditor, Point]) {
-    const res = await super.getDefinition(...args);
-    logger.log(res);
-    if (res == null) return null;
-    const { definitions, ...others } = res;
-    // `deno:/` から始まるカスタムリクエストは相対パスとして解釈されてしまう
-    // `deno://` に置換して返す
-    return {
-      definitions: definitions.map((d) => {
-        if (!d.path) return d;
-        if (typeof d.path != "string") return d;
-        if (
-          !d.path.startsWith("deno:/") || d.path.startsWith("deno://")
-        ) {
-          return d;
-        }
-        d.path = d.path.replace("deno:/", "deno://");
-        return d;
-      }),
-      ...others,
-    };
   }
   startServerProcess(_projectPath: string) {
     logger.log("Starting deno language server");
@@ -282,6 +261,10 @@ class DenoLanguageClient extends AutoLanguageClient {
       "outgoing",
     );
   }
+  preInitialization(conn: LanguageClientConnection) {
+    super.preInitialization(conn);
+    addHookToConnection(conn);
+  }
 }
 
 export default new DenoLanguageClient();
@@ -335,7 +318,7 @@ function onActivate(denoLS: DenoLanguageClient) {
     atom.config.observe("atom-ide-deno.advanced.debugMode", logger.observer),
     //virtual documentを表示
     atom.workspace.addOpener((filePath) => {
-      if (!filePath.startsWith("deno://")) {
+      if (!filePath.startsWith("deno-code://")) {
         return;
       }
       //autoHeightが無いとスクロールバーが出ない
@@ -380,13 +363,13 @@ function onActivate(denoLS: DenoLanguageClient) {
       }
       (async () => {
         const doc = await denoLS.getDenoVirtualTextDocument({
-          uri: filePath.replace("deno://", "deno:/"),
+          uri: filePath,
         });
         try {
           await editor.setText(doc, { bypassReadOnly: true });
         } catch {
           editor.setText(
-            `// load was failed. (${filePath.replace("deno://", "deno:/")})`,
+            `// load was failed. (${filePath})`,
             { bypassReadOnly: true },
           );
         } finally {
