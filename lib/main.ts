@@ -142,7 +142,10 @@ class DenoLanguageClient extends AutoLanguageClient {
     );
   }
   // deno-lint-ignore no-explicit-any
-  async sendCustomRequestForAnyEditor(method: string, params?: any[] | Record<string, any>) {
+  async sendCustomRequestForAnyEditor(
+    method: string,
+    params?: any[] | Record<string, any>,
+  ) {
     return (await this.getAnyConnection()).sendCustomRequest(method, params);
   }
   //custom request
@@ -373,7 +376,8 @@ function onActivate(denoLS: DenoLanguageClient) {
       ];
       // deno-lint-ignore no-explicit-any
       const calledArgs: { [P in trapFunctionName]?: any[][] } = {};
-      const originalFunctions: { [P in trapFunctionName]?: CallableFunction } = {};
+      const originalFunctions: { [P in trapFunctionName]?: CallableFunction } =
+        {};
       for (const funcName of trapFunctions) {
         calledArgs[funcName] = [];
         originalFunctions[funcName] = editor[funcName];
