@@ -141,9 +141,9 @@ class DenoLanguageClient extends AutoLanguageClient {
       params,
     );
   }
-  // deno-lint-ignore no-explicit-any
   async sendCustomRequestForAnyEditor(
     method: string,
+    // deno-lint-ignore no-explicit-any
     params?: any[] | Record<string, any>,
   ) {
     return (await this.getAnyConnection()).sendCustomRequest(method, params);
