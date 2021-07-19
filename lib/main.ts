@@ -265,6 +265,10 @@ class DenoLanguageClient extends AutoLanguageClient {
     super.preInitialization(conn);
     addHookToConnection(conn);
   }
+  isFileInProject(editor: TextEditor, projectPath: string) {
+    return super.isFileInProject(editor, projectPath) ||
+      (editor.getPath()?.startsWith("deno-code://") ?? false);
+  }
 }
 
 export default new DenoLanguageClient();
@@ -328,6 +332,12 @@ function onActivate(denoLS: DenoLanguageClient) {
         editor.getBuffer(),
         atom.grammars.selectGrammar(filePath, "" /*sourceText*/).scopeName,
       );
+      // パスの設定
+      editor.getBuffer().getPath = () => filePath;
+      editor.getPath = () => filePath;
+      // 保存時の「無効なパス」エラーを回避
+      editor.save = () => Promise.resolve();
+      editor.saveAs = () => Promise.resolve();
       // デフォルトの表示
       editor.setText("// please wait...\n");
       //読み取り専用
