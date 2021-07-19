@@ -30,12 +30,14 @@ function transStringInObject(arg: any, trans: (arg: string) => string): any {
   }
 }
 
+/** convert message from server to Atom */
 function encodeDenoURI<T>(arg: T): T {
   return transStringInObject(
     arg,
     (v) => v.replace(/^deno:\/(?!\/)/, "deno-code://"),
   );
 }
+/** convert message from Atom to server */
 function decodeDenoURI<T>(arg: T): T {
   return transStringInObject(
     arg,
