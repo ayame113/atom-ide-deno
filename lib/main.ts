@@ -13,7 +13,6 @@ import type {
   Logger,
 } from "atom-languageclient";
 import type { ServerManager } from "atom-languageclient/lib/server-manager";
-import type { Point } from "atom";
 import { CompositeDisposable, TextEditor } from "atom";
 import type { StatusBar } from "atom/status-bar";
 import type { TextDocumentIdentifier } from "vscode-languageserver-protocol";
