@@ -1,13 +1,7 @@
 import { CompositeDisposable, Disposable } from "atom";
+import { logger } from "./logger";
 import type { StatusBar, Tile } from "atom/status-bar";
-//https://github.com/atom/atom-select-list/pull/31
-//import {SelectListView} from "atom-select-list";
-
-interface SelectListView {
-  selectItem(item: Record<string, unknown> | string): Promise<void>;
-  confirmSelection(): void;
-  cancelSelection(): void;
-}
+import type SelectListView from "atom-select-list";
 
 type modes = "deno" | "node";
 let statusBarElement: HTMLAnchorElement;
@@ -46,10 +40,11 @@ export function activate({ grammarScopes }: { grammarScopes: string[] }) {
       );
       changeMode();
     }),
-    atom.workspace.observeActiveTextEditor((editor: any) => {
+    atom.workspace.observeActiveTextEditor((editor) => {
       //js/tsと設定画面以外ではステータスバーを非表示
       if (
-        grammarScopes.includes(editor?.getGrammar?.()?.scopeName) ||
+        grammarScopes.includes(editor?.getGrammar().scopeName ?? "") ||
+        // deno-lint-ignore no-explicit-any
         atom.workspace.getPaneItems().some((e: any) =>
           e?.getURI?.() == "atom://config"
         )
@@ -79,7 +74,7 @@ function changeMode() {
     return;
   }
   const newMode: modes = atom.config.get("atom-ide-deno.modes.currentMode");
-  // console.log(`Mode change to ${newMode}`);
+  logger.log(`Mode change to ${newMode}`);
   if (newMode == "deno") {
     statusBarElement.innerText = "Deno";
     statusBarElement.classList.remove("status-bar-icon-node");
@@ -123,6 +118,7 @@ function changeMode() {
     if (isEslintEnable) {
       // TODO: # I'll leave the code of activation for those who encountered in #44, but remove it after some time.
       await atom.commands.dispatch(
+        // deno-lint-ignore no-explicit-any
         (atom.workspace as any).getElement(),
         "linter:enable-linter",
       );
@@ -137,9 +133,11 @@ function changeMode() {
       }
       try {
         await atom.commands.dispatch(
+          // deno-lint-ignore no-explicit-any
           (atom.workspace.getActiveTextEditor() as any).getElement(),
           "linter:lint",
         );
+        // deno-lint-ignore no-empty
       } catch (_) {}
     }
   })();
