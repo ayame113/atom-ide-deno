@@ -13,19 +13,12 @@ import type {
   Logger,
 } from "atom-languageclient";
 import type { ServerManager } from "atom-languageclient/lib/server-manager";
-import type { Point } from "atom";
 import { CompositeDisposable, TextEditor } from "atom";
 import type { StatusBar } from "atom/status-bar";
 import type { TextDocumentIdentifier } from "vscode-languageserver-protocol";
 import cp from "child_process";
 import path from "path";
 
-// to call hierarchy
-import CallHierarchyAdapter from "./adapters/call-hierarchy-adapter";
-import type {
-  CallHierarchy,
-  CallHierarchyProvider,
-} from "./adapters/call-hierarchy";
 import { addHookToConnection } from "./connection_hook";
 
 const getDenoPath = (): string =>
@@ -220,55 +213,6 @@ class DenoLanguageClient extends AutoLanguageClient {
   // TODO: should return disposable?
   consumeStatusBar(statusBar: StatusBar) {
     autoConfig.consumeStatusBar(statusBar);
-  }
-  // CallHierarchy===========
-  callHierarchy?: CallHierarchyAdapter;
-  provideCallHierarchy(): CallHierarchyProvider {
-    return {
-      name: this.name,
-      grammarScopes: this.getGrammarScopes(),
-      priority: 1,
-      getIncomingCallHierarchy: this.getIncomingCallHierarchy.bind(this),
-      getOutgoingCallHierarchy: this.getOutgoingCallHierarchy.bind(this),
-    };
-  }
-  async getIncomingCallHierarchy(
-    editor: TextEditor,
-    point: Point,
-  ): Promise<CallHierarchy<"incoming"> | null> {
-    // TODO: remove any
-    // deno-lint-ignore no-explicit-any
-    const server = await ((this as any)._serverManager as ServerManager)
-      .getServer(editor);
-    if (server == null || !CallHierarchyAdapter.canAdapt(server.capabilities)) {
-      return null;
-    }
-    this.callHierarchy = this.callHierarchy || new CallHierarchyAdapter();
-    return this.callHierarchy.getCallHierarchy(
-      server.connection,
-      editor,
-      point,
-      "incoming",
-    );
-  }
-  async getOutgoingCallHierarchy(
-    editor: TextEditor,
-    point: Point,
-  ): Promise<CallHierarchy<"outgoing"> | null> {
-    // TODO: remove any
-    // deno-lint-ignore no-explicit-any
-    const server = await ((this as any)._serverManager as ServerManager)
-      .getServer(editor);
-    if (server == null || !CallHierarchyAdapter.canAdapt(server.capabilities)) {
-      return null;
-    }
-    this.callHierarchy = this.callHierarchy || new CallHierarchyAdapter();
-    return this.callHierarchy.getCallHierarchy(
-      server.connection,
-      editor,
-      point,
-      "outgoing",
-    );
   }
   preInitialization(conn: LanguageClientConnection) {
     super.preInitialization(conn);
