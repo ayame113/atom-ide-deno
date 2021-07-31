@@ -1,3 +1,5 @@
+import { Disposable } from "atom";
+
 export interface atomConfig {
   [key: string]:
     | configValObj
@@ -327,6 +329,7 @@ export const config: atomConfig = {
   },
 };
 
+const keyboardInputType = new Set(["string", "integer", "number", "array"]);
 /*
 キーボード入力のプロパティ一覧
 lspの再起動を延期する
@@ -341,10 +344,7 @@ returns->[
 function getKeyboardInputsKeyPath(o: atomConfig) {
   const res: string[][] = [];
   for (const [k, v] of Object.entries(o)) {
-    if (
-      ["string", "integer", "number", "array"].includes(v.type) &&
-      !("enum" in v)
-    ) {
+    if (keyboardInputType.has(v.type) && !("enum" in v)) {
       res.push([k]);
     } else if (v.type === "object") {
       const r = getKeyboardInputsKeyPath(v.properties);
@@ -354,4 +354,70 @@ function getKeyboardInputsKeyPath(o: atomConfig) {
   return res;
 }
 
-export const keyboardInputsKeyPath = getKeyboardInputsKeyPath(config);
+const debounceKeyPathList = getKeyboardInputsKeyPath(config).map(
+  (keyPath) => (keyPath.unshift("atom-ide-deno"), keyPath),
+);
+
+//config変更時にlspを再起動
+//文字列の入力途中でfile not foundエラーが出るため、2秒間間引く
+export function debouncedConfigOnDidChange(
+  keyPath: string,
+  // deno-lint-ignore no-explicit-any
+  callback: (values: { newValue: any; oldValue?: any }) => void,
+  debounceTime: number,
+): Disposable {
+  let timeout: NodeJS.Timeout;
+  // パスの先頭の`atom-ide-deno`は除外
+  const keyPathArray = keyPath.split(".");
+  // debounceKeyPathの先頭部分がkeyPathの一部でない場合はスキップ
+  const compareKeyPathList = debounceKeyPathList.filter(
+    (debounceKeyPath) =>
+      keyPathArray.every((key, i) => key === debounceKeyPath[i]),
+  ).map((debounceKeyPath) => debounceKeyPath.slice(keyPathArray.length));
+  return atom.config.onDidChange(keyPath, ({ newValue, oldValue }) => {
+    clearTimeout(timeout);
+    const shouldDebounce = compareKeyPathList.some(
+      (compareKeyPathList) => {
+        // 比較するkeyPathの値を取得
+        const newCompareValue = getValueFromKeyPathArray(
+          newValue,
+          compareKeyPathList,
+        );
+        const oldCompareValue = getValueFromKeyPathArray(
+          oldValue,
+          compareKeyPathList,
+        );
+        // 値が変更されている場合は実行を延期
+        if (
+          typeof oldCompareValue === "string" &&
+          typeof newCompareValue === "string"
+        ) {
+          return oldCompareValue !== newCompareValue;
+        }
+        if (
+          typeof oldCompareValue === "number" &&
+          typeof newCompareValue === "number"
+        ) {
+          return oldCompareValue !== newCompareValue;
+        }
+        return JSON.stringify(oldCompareValue) !==
+          JSON.stringify(newCompareValue);
+      },
+    );
+    if (shouldDebounce) {
+      timeout = setTimeout(() => {
+        callback({ oldValue, newValue });
+      }, debounceTime);
+    } else {
+      callback({ oldValue, newValue });
+    }
+  });
+}
+
+function getValueFromKeyPathArray(
+  // deno-lint-ignore no-explicit-any
+  obj: Record<string, any>,
+  keyPathArray: string[],
+) {
+  return keyPathArray.reduce((target, keyPath) => target?.[keyPath], obj);
+}
