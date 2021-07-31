@@ -110,10 +110,6 @@ class DenoLanguageClient extends AutoLanguageClient {
     logger.log("Starting deno language server");
     return cp.spawn(getDenoPath(), ["lsp"], { env: process.env });
   }
-  // TODO: should return disposable?
-  consumeStatusBar(statusBar: StatusBar) {
-    autoConfig.consumeStatusBar(statusBar);
-  }
   preInitialization(conn: LanguageClientConnection) {
     super.preInitialization(conn);
     addHookToConnection(conn);
@@ -121,6 +117,16 @@ class DenoLanguageClient extends AutoLanguageClient {
   isFileInProject(editor: TextEditor, projectPath: string) {
     return super.isFileInProject(editor, projectPath) ||
       (editor.getPath()?.startsWith("deno-code://") ?? false);
+  }
+  getLanguageIdFromEditor(editor: TextEditor) {
+    if (editor.getGrammar().scopeName === "source.gfm") {
+      return "markdown";
+    }
+    return super.getLanguageIdFromEditor(editor);
+  }
+  // TODO: should return disposable?
+  consumeStatusBar(statusBar: StatusBar) {
+    autoConfig.consumeStatusBar(statusBar);
   }
 }
 
