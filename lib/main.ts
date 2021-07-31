@@ -1,12 +1,6 @@
-import { config, debouncedConfigOnDidChange } from "./config";
-import type { atomConfig } from "./config";
-import * as autoConfig from "./auto_config";
-import { logger } from "./logger";
-import { addHookToConnection } from "./connection_hook";
-import { CommandResolver } from "./command_resolver";
-import { createVirtualDocumentOpener } from "./virtual_documet";
-import { getDenoPath } from "./utils";
-
+import { CompositeDisposable } from "atom";
+import type { TextEditor } from "atom";
+import type { StatusBar } from "atom/status-bar";
 import { AutoLanguageClient } from "atom-languageclient";
 import type {
   LanguageClientConnection,
@@ -14,10 +8,17 @@ import type {
   Logger,
 } from "atom-languageclient";
 import type { ServerManager } from "atom-languageclient/build/lib/server-manager";
-import { CompositeDisposable, TextEditor } from "atom";
-import type { StatusBar } from "atom/status-bar";
 import type { TextDocumentIdentifier } from "vscode-languageserver-protocol";
 import cp from "child_process";
+
+import { config, debouncedConfigOnDidChange } from "./config";
+import type { atomConfig } from "./config";
+import * as autoConfig from "./auto_config";
+import { addHookToConnection } from "./connection_hook";
+import { CommandResolver } from "./command_resolver";
+import { createVirtualDocumentOpener } from "./virtual_documet";
+import { getDenoPath } from "./utils";
+import { logger } from "./logger";
 
 class DenoLanguageClient extends AutoLanguageClient {
   config: atomConfig = config;

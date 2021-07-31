@@ -6,6 +6,7 @@ import type {
 } from "atom-languageclient/build/lib/languageclient";
 import type * as lsp from "vscode-languageserver-protocol";
 import type * as jsonrpc from "vscode-jsonrpc";
+
 import { addHook, addHookToObject } from "./utils";
 
 // Hack: Intervene in the connection with lsp and rewrite the URL of the request.

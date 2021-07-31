@@ -1,5 +1,6 @@
 // using custom formatter
 import cp from "child_process";
+
 import { logger } from "./logger";
 
 export const options = {

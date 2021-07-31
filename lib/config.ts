@@ -1,4 +1,4 @@
-import { Disposable } from "atom";
+import type { Disposable } from "atom";
 
 export interface atomConfig {
   [key: string]:

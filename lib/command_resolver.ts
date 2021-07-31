@@ -3,10 +3,10 @@ import type { DisposableLike } from "atom";
 import { Convert } from "atom-languageclient";
 import path from "path";
 
-import { getDenoPath } from "./utils";
 import type { DenoLanguageClient } from "./main";
 import * as formatter from "./formatter";
 import { logger } from "./logger";
+import { getDenoPath } from "./utils";
 import { menu } from "../menus/main.json";
 
 export class CommandResolver implements DisposableLike {

@@ -1,7 +1,8 @@
 import { CompositeDisposable, Disposable } from "atom";
-import { logger } from "./logger";
 import type { StatusBar, Tile } from "atom/status-bar";
 import type SelectListView from "atom-select-list";
+
+import { logger } from "./logger";
 
 type modes = "deno" | "node";
 let statusBarElement: HTMLAnchorElement;

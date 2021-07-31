@@ -1,4 +1,4 @@
-import { Logger } from "atom-languageclient";
+import type { Logger } from "atom-languageclient";
 
 class CustomLogger implements Logger {
   #shouldOutput = false;
