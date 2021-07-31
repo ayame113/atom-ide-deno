@@ -10,13 +10,13 @@
               "label": "Cache Dependencies",
               "command": "deno:cache",
               "description": "Cache the active workspace document and its dependencies.",
-              "methodName": "getDenoCacheAll"
+              "methodName": "cacheAllFile"
             },
             {
               "label": "Reload Import Registries Cache",
               "command": "deno:reload-import-registries",
               "description": "Reload any cached import registry responses.",
-              "methodName": "getDenoReloadImportRegistries"
+              "methodName": "reloadImportRegistries"
             },
             {
               "label": "Restart Language Server",
@@ -28,7 +28,7 @@
               "label": "Language Server Status",
               "command": "deno:status",
               "description": "Provide a status document of the language server.",
-              "methodName": "showDenoStatusDocument"
+              "methodName": "showLanguageServerStatus"
             },
             {
               "label": "Format Current File",

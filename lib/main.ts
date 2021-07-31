@@ -1,33 +1,29 @@
-import { config, keyboardInputsKeyPath } from "./config";
-import type { atomConfig } from "./config";
-import * as formatter from "./formatter";
-import * as autoConfig from "./auto_config";
-import { menu } from "../menus/main.json";
-import { logger } from "./logger";
-
-import { AutoLanguageClient, Convert } from "atom-languageclient";
+import { CompositeDisposable } from "atom";
+import type { TextEditor } from "atom";
+import type { StatusBar } from "atom/status-bar";
+import { AutoLanguageClient } from "atom-languageclient";
 import type {
-  ActiveServer,
   LanguageClientConnection,
   LanguageServerProcess,
   Logger,
 } from "atom-languageclient";
-import type { ServerManager } from "atom-languageclient/lib/server-manager";
-import { CompositeDisposable, TextEditor } from "atom";
-import type { StatusBar } from "atom/status-bar";
+import type { ServerManager } from "atom-languageclient/build/lib/server-manager";
 import type { TextDocumentIdentifier } from "vscode-languageserver-protocol";
 import cp from "child_process";
-import path from "path";
 
+import { config, debouncedConfigOnDidChange } from "./config";
+import type { atomConfig } from "./config";
+import * as autoConfig from "./auto_config";
 import { addHookToConnection } from "./connection_hook";
-
-const getDenoPath = (): string =>
-  atom.config.get("atom-ide-deno.path") || "deno";
+import { CommandResolver } from "./command_resolver";
+import { createVirtualDocumentOpener } from "./virtual_documet";
+import { getDenoPath } from "./utils";
+import { logger } from "./logger";
 
 class DenoLanguageClient extends AutoLanguageClient {
   config: atomConfig = config;
-  _emptyConnection!: LanguageClientConnection;
-  subscriptions!: CompositeDisposable;
+  request!: DenoCustomRequest;
+  #subscriptions!: CompositeDisposable;
   getGrammarScopes() {
     return [
       "source.js",
@@ -37,6 +33,7 @@ class DenoLanguageClient extends AutoLanguageClient {
       "JavaScript",
       "TypeScript",
       "source.gfm",
+      "text.md",
       "source.json",
     ];
   }
@@ -49,11 +46,11 @@ class DenoLanguageClient extends AutoLanguageClient {
   getInitializeParams(...args: [string, LanguageServerProcess]) {
     logger.log("initializing...");
     const initializationOptions = atom.config.get("atom-ide-deno.lspFlags");
-    //filter empty string
+    // filter empty string
     initializationOptions.importMap = initializationOptions.importMap || void 0;
     initializationOptions.config = initializationOptions.config || void 0;
-    //suggest.imports.hosts の入力はArrayだが、渡すときにObjectに変換する必要がある
-    //https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md
+    // suggest.imports.hosts の入力はArrayだが、渡すときにObjectに変換する必要がある
+    // https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md
     try {
       initializationOptions.suggest.imports.hosts = Object.fromEntries(
         initializationOptions.suggest.imports.hosts.map((
@@ -76,15 +73,30 @@ class DenoLanguageClient extends AutoLanguageClient {
       mod.install("atom-ide-deno", true)
     );
     super.activate();
-    this.subscriptions = new CompositeDisposable();
-    onActivate(this);
+    this.#subscriptions = new CompositeDisposable();
+    this.request = new DenoCustomRequest(this);
+    this.#subscriptions.add(
+      debouncedConfigOnDidChange(
+        "atom-ide-deno.lspFlags",
+        () => this.restartAllServers(),
+        2000,
+      ),
+      debouncedConfigOnDidChange(
+        "atom-ide-deno.path",
+        () => this.restartAllServers(),
+        2000,
+      ),
+      atom.config.observe("atom-ide-deno.advanced.debugMode", logger.observer),
+      createVirtualDocumentOpener(this),
+      new CommandResolver(this),
+    );
     autoConfig.activate({ grammarScopes: this.getGrammarScopes() });
   }
   async deactivate() {
     logger.log("deactivating...");
     autoConfig.deactivate();
     await super.deactivate();
-    this.subscriptions?.dispose();
+    this.#subscriptions.dispose();
   }
   restartAllServers(...args: []) {
     logger.log("restart Deno Language server");
@@ -97,118 +109,6 @@ class DenoLanguageClient extends AutoLanguageClient {
   startServerProcess(_projectPath: string) {
     logger.log("Starting deno language server");
     return cp.spawn(getDenoPath(), ["lsp"], { env: process.env });
-  }
-  //custom request util
-  getCurrentConnection(): Promise<LanguageClientConnection | null> {
-    const currentEditor = atom.workspace.getActiveTextEditor();
-    if (currentEditor) {
-      return this.getConnectionForEditor(currentEditor);
-    } else {
-      return Promise.resolve(null);
-    }
-  }
-  async getAnyConnection() {
-    // deno-lint-ignore no-explicit-any
-    const activeServers = ((this as any)._serverManager as ServerManager)
-      .getActiveServers();
-    if (activeServers.length) {
-      return activeServers[0].connection;
-    }
-    //activeServerが空の場合、仮のconnectionを用意
-    if (!this._emptyConnection) {
-      this._emptyConnection =
-        // deno-lint-ignore no-explicit-any
-        (await ((this as any).startServer("") as Promise<ActiveServer>))
-          .connection;
-      return this._emptyConnection;
-    }
-    return this._emptyConnection;
-  }
-  async sendCustomRequestForCurrentEditor(
-    method: string,
-    // deno-lint-ignore no-explicit-any
-    params?: any[] | Record<string, any>,
-  ) {
-    return (await this.getCurrentConnection())?.sendCustomRequest(
-      method,
-      params,
-    );
-  }
-  async sendCustomRequestForAnyEditor(
-    method: string,
-    // deno-lint-ignore no-explicit-any
-    params?: any[] | Record<string, any>,
-  ) {
-    return (await this.getAnyConnection()).sendCustomRequest(method, params);
-  }
-  //custom request
-  getDenoCache(textEditor?: TextEditor) {
-    const editor = textEditor || atom.workspace.getActiveTextEditor();
-    if (!editor) {
-      return;
-    }
-    return this.sendCustomRequestForCurrentEditor("deno/cache", {
-      referrer: Convert.editorToTextDocumentIdentifier(editor),
-      uris: [],
-    });
-  }
-  getDenoPerformance() {
-    return this.sendCustomRequestForAnyEditor("deno/performance");
-  }
-  getDenoReloadImportRegistries() {
-    return this.sendCustomRequestForAnyEditor("deno/reloadImportRegistries");
-  }
-  getDenoVirtualTextDocument(textDocumentIdentifier: TextDocumentIdentifier) {
-    return this.sendCustomRequestForAnyEditor("deno/virtualTextDocument", {
-      textDocument: textDocumentIdentifier,
-    });
-  }
-  //custom request extends
-  getDenoCacheAll() {
-    const grammarScopes = this.getGrammarScopes();
-    return Promise.all(
-      atom.workspace.getTextEditors()
-        .filter((editor) =>
-          grammarScopes.includes(editor.getGrammar().scopeName)
-        )
-        .map((editor) => this.getDenoCache(editor)),
-    );
-  }
-  getDenoStatusDocument() {
-    return this.getDenoVirtualTextDocument({ uri: "deno:/status.md" });
-  }
-  async showDenoStatusDocument() {
-    return atom.notifications.addInfo("Deno Language Server", {
-      description: await this.getDenoStatusDocument(),
-      dismissable: true,
-      icon: "deno",
-    });
-  }
-  formatCurrent() {
-    const filePath = atom.workspace.getActiveTextEditor()?.getPath();
-    if (!filePath) {
-      return;
-    }
-    formatter.formatFile(getDenoPath(), [], filePath);
-  }
-  async formatAll() {
-    for (const projectPath of atom.project.getPaths()) {
-      logger.log(`format: ${projectPath}`);
-      const { stderr } = await formatter.formatFile(
-        getDenoPath(),
-        [
-          formatter.options.ignore(
-            atom.config.get("atom-ide-deno.format.onCommand.excludDir")
-              .map((d: string) => path.resolve(projectPath, d)),
-          ),
-        ],
-        projectPath,
-      );
-      atom.notifications.addInfo("Deno Format Result", {
-        description: stderr.replace(/\n/g, "<br>\n"),
-        icon: "deno",
-      });
-    }
   }
   // TODO: should return disposable?
   consumeStatusBar(statusBar: StatusBar) {
@@ -224,160 +124,97 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
 }
 
+export type { DenoLanguageClient };
 export default new DenoLanguageClient();
-function onActivate(denoLS: DenoLanguageClient) {
-  //config変更時にlspを再起動
-  //文字列の入力途中でfile not foundエラーが出るため、2秒間間引く
-  let inputTimeoutId: NodeJS.Timeout;
-  function restartServer(
-    // deno-lint-ignore no-explicit-any
-    { oldValue = {}, newValue }: { oldValue?: any; newValue: any },
-    keyPathbase: string[],
-  ) {
-    logger.log("atom-ide-deno config change caught");
-    clearTimeout(inputTimeoutId);
-    let isDefferRestart = false;
-    //keyboardInputsKeyPathに含まれるキーの値が変更されていれば、実行を延期（間引く）
-    for (const keyPath of keyboardInputsKeyPath) {
-      //無関係なkeyPathは無視
-      if (!keyPathbase.every((v, i) => keyPath[i] == v)) {
-        continue;
-      }
-      //keyPathbaseを起点としてdiff
-      let oldV = oldValue;
-      let newV = newValue;
-      for (const key of keyPath.slice(keyPathbase.length)) {
-        oldV = oldV?.[key];
-        newV = newV?.[key];
-      }
-      //値は配列か文字列か数値
-      isDefferRestart = JSON.stringify(oldV) !== JSON.stringify(newV);
-      if (isDefferRestart) {
-        break;
-      }
-    }
-    if (isDefferRestart) {
-      inputTimeoutId = setTimeout(() => {
-        denoLS.restartAllServers();
-      }, 2000);
-    } else {
-      denoLS.restartAllServers();
-    }
+
+export class DenoCustomRequest {
+  #client: DenoLanguageClient;
+  #emptyConnection?: LanguageClientConnection;
+  constructor(client: DenoLanguageClient) {
+    this.#client = client;
   }
-  denoLS.subscriptions.add(
-    atom.config.onDidChange(
-      "atom-ide-deno.lspFlags",
-      (v) => restartServer(v, ["lspFlags"]),
-    ),
-    atom.config.onDidChange(
-      "atom-ide-deno.path",
-      (v) => restartServer(v, ["path"]),
-    ),
-    atom.config.observe("atom-ide-deno.advanced.debugMode", logger.observer),
-    //virtual documentを表示
-    atom.workspace.addOpener((filePath) => {
-      if (!filePath.startsWith("deno-code://")) {
-        return;
-      }
-      //autoHeightが無いとスクロールバーが出ない
-      const editor = new TextEditor({ autoHeight: false });
-      //言語モードを設定
-      atom.grammars.assignLanguageMode(
-        editor.getBuffer(),
-        atom.grammars.selectGrammar(filePath, "" /*sourceText*/).scopeName,
-      );
-      // パスの設定
-      editor.getBuffer().getPath = () => filePath;
-      // 保存時の「無効なパス」エラーを回避
-      editor.save = () => Promise.resolve();
-      editor.saveAs = () => Promise.resolve();
-      // デフォルトの表示
-      editor.setText("// please wait...\n");
-      //読み取り専用
-      editor.setReadOnly(true);
-      //タブ名
-      editor.getTitle = () => filePath;
-      editor.getLongTitle = () => filePath;
-      //保存を無効にする
-      // @ts-ignore: no type
-      editor.shouldPromptToSave = () => false;
-      //閉じるボタンの表示を調整
-      editor.isModified = () => false;
-      editor.getBuffer().isModified = () => false;
-      //pendingモードにする（次回開いたときに表示されないようにする）
-      setTimeout((_) => {
-        // deno-lint-ignore no-explicit-any
-        (atom.workspace.getActivePane() as any).setPendingItem(editor);
-      }, 500);
-      // defer execution until the content display is complete
-      // notice: return value is ignored
-      type trapFunctionName =
-        | "setCursorBufferPosition"
-        | "scrollToBufferPosition";
-      const trapFunctions: Array<trapFunctionName> = [
-        "setCursorBufferPosition",
-        "scrollToBufferPosition",
-      ];
+  #getConnection = async (editor?: TextEditor) => {
+    const serverManager =
       // deno-lint-ignore no-explicit-any
-      const calledArgs: { [P in trapFunctionName]?: any[][] } = {};
-      const originalFunctions: { [P in trapFunctionName]?: CallableFunction } =
-        {};
-      for (const funcName of trapFunctions) {
-        calledArgs[funcName] = [];
-        originalFunctions[funcName] = editor[funcName];
-        // deno-lint-ignore no-explicit-any
-        editor[funcName] = (...args: any[]) => calledArgs[funcName]?.push(args);
+      ((this.#client as any)._serverManager as ServerManager);
+    if (editor) {
+      const server = (await serverManager.getServer(editor));
+      if (!server) {
+        throw new Error("has no connection");
       }
-      (async () => {
-        const doc = await denoLS.getDenoVirtualTextDocument({
-          uri: filePath,
-        });
-        try {
-          editor.setText(doc, { bypassReadOnly: true });
-        } catch {
-          editor.setText(
-            `// load was failed. (${filePath})`,
-            { bypassReadOnly: true },
-          );
-        } finally {
-          // execute deferred function
-          for (const funcName of trapFunctions) {
-            // @ts-ignore: hack
-            editor[funcName] = originalFunctions[funcName];
-            // @ts-ignore: hack
-            calledArgs[funcName].forEach((args) => editor[funcName](...args));
-          }
-        }
-      })();
-      return editor;
-    }),
-    //コマンド登録
-    //コマンドの内容はmenu/main.jsonで管理
-    atom.commands.add(
-      "atom-workspace",
-      Object.fromEntries(
-        menu
-          .filter((v) => v.label === "Packages")
-          .flatMap((v) => v.submenu)
-          .filter((v) => v.label === "Deno")
-          .flatMap((v) => v.submenu)
-          .map((v) => [
-            v.command,
-            {
-              didDispatch: () => {
-                type methodName =
-                  | "getDenoCacheAll"
-                  | "getDenoReloadImportRegistries"
-                  | "restartAllServers"
-                  | "showDenoStatusDocument"
-                  | "formatAll";
-                denoLS[v.methodName as methodName]();
-              },
-              displayName: `Deno: ${v.label}`,
-              description: v.description,
-            },
-          ]),
-      ),
-    ),
-  );
+      return server.connection;
+    }
+    const activeServers = serverManager.getActiveServers();
+    if (activeServers.length) {
+      const server = activeServers.find((c) => c.connection.isConnected);
+      if (server) {
+        return server.connection;
+      }
+    }
+    //activeServerが空の場合、仮のconnectionを用意
+    if (!this.#emptyConnection) {
+      this.#emptyConnection = (await serverManager.startServer(
+        (await serverManager.getNormalizedProjectPaths())[0],
+      )).connection;
+    }
+    return this.#emptyConnection;
+  };
+  #sendCustomRequest = async <T extends CustomRequestName>(
+    requestName: T,
+    requestParam: CustomRequestParameter<T>,
+    editor?: TextEditor,
+  ): CustomRequestReturn<T> => {
+    return (await this.#getConnection(editor)).sendCustomRequest(
+      requestName,
+      requestParam,
+    );
+  };
+  cache(
+    param: CustomRequestParameter<"deno/cache">,
+    editor: TextEditor,
+  ) {
+    return this.#sendCustomRequest("deno/cache", param, editor);
+  }
+  performance() {
+    return this.#sendCustomRequest("deno/performance", undefined);
+  }
+  reloadImportRegistries() {
+    return this.#sendCustomRequest("deno/reloadImportRegistries", undefined);
+  }
+  virtualTextDocument(
+    param: CustomRequestParameter<"deno/virtualTextDocument">,
+  ) {
+    return this.#sendCustomRequest("deno/virtualTextDocument", param);
+  }
+}
+
+type CustomRequestName = keyof CustomRequest;
+type CustomRequestParameter<T extends CustomRequestName> =
+  CustomRequest[T]["param"];
+type CustomRequestReturn<T extends CustomRequestName> = Promise<
+  CustomRequest[T]["return"]
+>;
+
+interface CustomRequest {
+  "deno/cache": {
+    param: {
+      referrer: TextDocumentIdentifier;
+      uris: TextDocumentIdentifier[];
+    };
+    return: void;
+  };
+  "deno/performance": {
+    param: undefined;
+    return: void;
+  };
+  "deno/reloadImportRegistries": {
+    param: undefined;
+    return: void;
+  };
+  "deno/virtualTextDocument": {
+    param: {
+      textDocument: TextDocumentIdentifier;
+    };
+    return: string;
+  };
 }
