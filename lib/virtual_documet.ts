@@ -1,5 +1,6 @@
 import { TextEditor } from "atom";
 import type { Disposable } from "atom";
+import { Convert } from "atom-languageclient";
 
 import type { DenoLanguageClient } from "./main";
 import { trapMethod } from "./utils";
@@ -55,7 +56,7 @@ export function createVirtualDocumentOpener(
       try {
         const doc = await client.request.virtualTextDocument({
           textDocument: {
-            uri: filePath,
+            uri: Convert.pathToUri(filePath),
           },
         });
         editor.setText(doc, { bypassReadOnly: true });
