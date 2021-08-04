@@ -81,7 +81,7 @@ export class CommandResolver implements DisposableLike {
     this.#assertsNotDisposed();
     const item = Object.assign(document.createElement("div"), {
       getTitle: () => "Deno Language Server Status",
-      getIcon: () => "deno",
+      getIconName: () => "deno",
       innerHTML: await render(
         await this.#client.request.virtualTextDocument({
           textDocument: { uri: "deno:/status.md" },

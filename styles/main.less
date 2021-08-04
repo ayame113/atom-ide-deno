@@ -2,11 +2,13 @@
 @import "ui-variables";
 
 .icon-deno::before {
-	content: ' ' !important;
-	background-size: 75%;
-	background-repeat: no-repeat;
-	background-position: 50% 0.75em;
-	background-image: var(--atom-ide-deno-deno-image-data-url);
+  content: '    ' !important;
+  background-repeat: no-repeat;
+  background-image: var(--atom-ide-deno-deno-image-data-url);
+  height: 1.2em;
+  background-size: contain;
+  display: inline-block;
+  font-size: 1.2em;
 }
 .atom-ide-deno-status-bar-disable,
 .atom-ide-deno-status-bar-not-in-scope{
