@@ -1,0 +1,47 @@
+@import url('./deno-png.css');
+@import "ui-variables";
+
+.icon-deno::before {
+  content: '    ' !important;
+  background-repeat: no-repeat;
+  background-image: var(--atom-ide-deno-deno-image-data-url);
+  height: 1.2em;
+  background-size: contain;
+  display: inline-block;
+  font-size: 1.2em;
+}
+.atom-ide-deno-status-bar-disable,
+.atom-ide-deno-status-bar-not-in-scope{
+  display: none;
+}
+
+.status-bar-icon-deno::before,
+.status-bar-icon-node::before {
+  content: "";
+  background-size: 68%;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  vertical-align: bottom;
+}
+.status-bar-icon-deno::before {
+  background-image: var(--atom-ide-deno-deno-image-data-url);
+}
+.status-bar-icon-node::before {
+  background-image: var(--atom-ide-deno-polygon-data-url);
+}
+
+.deno-language-server-status {
+  overflow: auto;
+  background-color: @pane-item-background-color;
+  font-size: 1.2em;
+  padding: 1em;
+  summary {
+    cursor: pointer;
+  }
+  pre {
+    font-size: 0.8em;
+  }
+}

@@ -1,6 +1,7 @@
 import { CompositeDisposable } from "atom";
 import type { DisposableLike } from "atom";
 import { Convert } from "atom-languageclient";
+import { render } from "atom-ide-markdown-service/dist/renderer";
 import path from "path";
 
 import type { DenoLanguageClient } from "./main";
@@ -78,13 +79,18 @@ export class CommandResolver implements DisposableLike {
   }
   async showLanguageServerStatus() {
     this.#assertsNotDisposed();
-    atom.notifications.addInfo("Deno Language Server", {
-      description: await this.#client.request.virtualTextDocument({
-        textDocument: { uri: "deno:/status.md" },
-      }),
-      dismissable: true,
-      icon: "deno",
+    const item = Object.assign(document.createElement("div"), {
+      getTitle: () => "Deno Language Server Status",
+      getIconName: () => "deno",
+      innerHTML: await render(
+        await this.#client.request.virtualTextDocument({
+          textDocument: { uri: "deno:/status.md" },
+        }),
+      ),
     });
+    item.classList.add("deno-language-server-status");
+    const targetPane = atom.workspace.getCenter().getPanes()[0];
+    targetPane.activateItem(targetPane.addItem(item));
   }
   restartAllServers() {
     this.#assertsNotDisposed();
