@@ -19,6 +19,7 @@ import { CommandResolver } from "./command_resolver";
 import { createVirtualDocumentOpener } from "./virtual_documet";
 import { getDenoPath } from "./utils";
 import { logger } from "./logger";
+import { observeOnSaveFormatter } from "./formatter";
 
 class DenoLanguageClient extends AutoLanguageClient {
   config: atomConfig = config;
@@ -89,6 +90,7 @@ class DenoLanguageClient extends AutoLanguageClient {
       atom.config.observe("atom-ide-deno.advanced.debugMode", logger.observer),
       createVirtualDocumentOpener(this),
       new CommandResolver(this),
+      observeOnSaveFormatter(),
     );
     autoConfig.activate({ grammarScopes: this.getGrammarScopes() });
   }
