@@ -7,9 +7,11 @@ import type {
   LanguageServerProcess,
   Logger,
 } from "atom-languageclient";
+import { normalizePath } from "atom-languageclient/build/lib/server-manager";
 import type { ServerManager } from "atom-languageclient/build/lib/server-manager";
 import type { TextDocumentIdentifier } from "vscode-languageserver-protocol";
 import cp from "child_process";
+import path from "path";
 
 import { config, debouncedConfigOnDidChange } from "./config";
 import type { atomConfig } from "./config";
@@ -116,9 +118,20 @@ class DenoLanguageClient extends AutoLanguageClient {
     super.preInitialization(conn);
     addHookToConnection(conn);
   }
-  isFileInProject(editor: TextEditor, projectPath: string) {
-    return super.isFileInProject(editor, projectPath) ||
-      (editor.getPath()?.startsWith("deno-code://") ?? false);
+  isFileInProject() {
+    return true;
+  }
+  determineProjectPath(textEditor: TextEditor) {
+    const projectPath = super.determineProjectPath(textEditor);
+    if (projectPath) {
+      return projectPath;
+    }
+    // When projectPath is null, use the directory where the file exists as the project path.
+    const editorPath = textEditor.getPath();
+    if (typeof editorPath !== "string") {
+      return null;
+    }
+    return normalizePath(path.dirname(editorPath));
   }
   getLanguageIdFromEditor(editor: TextEditor) {
     if (editor.getGrammar().scopeName === "source.gfm") {
