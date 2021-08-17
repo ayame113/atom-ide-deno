@@ -107,22 +107,22 @@
         "0.1.0": "provideFindReferences"
       }
     },
-    "code-format.range": {
+    "__code-format.range": {
       "versions": {
         "0.1.0": "provideRangeCodeFormat"
       }
     },
-    "code-format.file": {
+    "__code-format.file": {
       "versions": {
         "0.1.0": "provideFileCodeFormat"
       }
     },
-    "code-format.onType": {
+    "__code-format.onType": {
       "versions": {
         "0.1.0": "provideOnTypeCodeFormat"
       }
     },
-    "code-format.onSave": {
+    "__code-format.onSave": {
       "versions": {
         "0.1.0": "provideOnSaveCodeFormat"
       }

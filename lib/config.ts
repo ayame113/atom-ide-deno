@@ -287,6 +287,50 @@ export const config: atomConfig = {
     type: "object",
     order: 3,
     properties: {
+      onSave: {
+        title: "Format on save",
+        type: "object",
+        order: 1,
+        properties: {
+          enable: {
+            title: "enables",
+            type: "boolean",
+            default: true,
+            order: 1,
+          },
+          extensions: {
+            title: "File type to enable",
+            type: "object",
+            order: 2,
+            properties: {
+              "source_js": {
+                title: "JavaScript",
+                type: "boolean",
+                default: true,
+                order: 1,
+              },
+              "source_ts": {
+                title: "TypeScript",
+                type: "boolean",
+                default: true,
+                order: 2,
+              },
+              "source_gfm": {
+                title: "markdown",
+                type: "boolean",
+                default: true,
+                order: 3,
+              },
+              "source_json": {
+                title: "json",
+                type: "boolean",
+                default: true,
+                order: 4,
+              },
+            },
+          },
+        },
+      },
       onCommand: {
         title: "Format on command",
         type: "object",

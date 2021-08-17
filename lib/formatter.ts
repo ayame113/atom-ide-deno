@@ -1,7 +1,9 @@
 // using custom formatter
+import { CompositeDisposable } from "atom";
 import cp from "child_process";
 
 import { logger } from "./logger";
+import { getDenoPath } from "./utils";
 
 export const options = {
   check: "--check",
@@ -41,4 +43,38 @@ export function formatFile(
       resolve({ error, stdout, stderr });
     });
   });
+}
+
+export function observeOnSaveFormatter(): CompositeDisposable {
+  // save on format
+  const disposable = new CompositeDisposable();
+  disposable.add(
+    atom.workspace.observeTextEditors((editor) => {
+      const onDidSave = editor.onDidSave(({ path }) => {
+        if (!atom.config.get("atom-ide-deno.format.onSave.enable")) {
+          logger.log(`ignored format(disabled): ${path}`);
+          return;
+        }
+        if (
+          !atom.config.get(
+            `atom-ide-deno.format.onSave.extensions.${
+              editor.getGrammar().scopeName.replace(/\./g, "_")
+            }`,
+          )
+        ) {
+          logger.log(`ignored format(exclude extension): ${path}`);
+          return;
+        }
+        logger.log(`format: ${path}`);
+        formatFile(getDenoPath(), [], path);
+      });
+      disposable.add(
+        editor.onDidDestroy(() => {
+          onDidSave.dispose();
+        }),
+        onDidSave,
+      );
+    }),
+  );
+  return disposable;
 }
