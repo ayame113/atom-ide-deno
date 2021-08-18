@@ -36,7 +36,9 @@ export class CommandResolver implements DisposableLike {
                     typeof this[v.methodName as keyof CommandResolver] !==
                       "function"
                   ) {
-                    throw new Error(`Error: ${v.methodName} is not a function.`);
+                    throw new Error(
+                      `Error: ${v.methodName} is not a function.`,
+                    );
                   }
                   this[v.methodName as keyof CommandResolver]();
                 },
@@ -54,7 +56,9 @@ export class CommandResolver implements DisposableLike {
   }
   #assertsNotDisposed = () => {
     if (this.#isDisposed) {
-      throw new Error("Error: Could not connect to the language server because the connection was dropped.");
+      throw new Error(
+        "Error: Could not connect to the language server because the connection was dropped.",
+      );
     }
   };
   cacheAllFile() {
