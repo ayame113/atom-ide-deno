@@ -194,18 +194,26 @@ export const config: atomConfig = {
         default: "",
         order: 4,
       },
+      cache: {
+        title: "Path to cache directory",
+        description:
+          "Specify an explicit path to the `deno` cache instead of using DENO_DIR or the OS default.",
+        type: "string",
+        default: "",
+        order: 5,
+      },
       config: {
         title: "Path to tsconfig",
         description:
           "Relative path from the project root (ex. `./tsconfig.json`)",
         type: "string",
         default: "",
-        order: 5,
+        order: 6,
       },
       codeLens: {
         title: "code lens",
         type: "object",
-        order: 6,
+        order: 7,
         properties: {
           implementations: {
             title: "Enables implementations",
@@ -225,12 +233,19 @@ export const config: atomConfig = {
             default: true,
             order: 3,
           },
+          test: {
+            title:
+              "Enables the display of code lenses that allow running of individual tests in the code.",
+            type: "boolean",
+            default: true,
+            order: 4,
+          },
         },
       },
       suggest: {
         title: "suggest",
         type: "object",
-        order: 7,
+        order: 8,
         properties: {
           autoImports: {
             title: "Enables auto imports",
@@ -261,17 +276,32 @@ export const config: atomConfig = {
             type: "object",
             order: 5,
             properties: {
+              autoDiscover: {
+                title: "Auto Discover",
+                description:
+                  "If enabled, when new hosts/origins are encountered that support import suggestions, you will be prompted to enable or disable it.",
+                type: "boolean",
+                default: true,
+                order: 1,
+              },
               hosts: {
                 title: "List of hosts",
                 description:
                   "Controls which hosts are enabled for import suggestions. See [vscode's document](https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md)",
                 type: "array",
-                default: [
-                  "https://deno.land/",
-                  "https://x.nest.land/",
-                  "https://envoy.now.sh/",
-                ],
-                order: 1,
+                default: ["https://deno.land"],
+                order: 2,
+                items: {
+                  type: "string",
+                },
+              },
+              excludedHosts: {
+                title: "List of excluded hosts",
+                description:
+                  "Controls which hosts are **disabled** for import suggestions. See [vscode's document](https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md)",
+                type: "array",
+                default: [],
+                order: 3,
                 items: {
                   type: "string",
                 },

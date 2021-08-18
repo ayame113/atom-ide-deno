@@ -1,4 +1,4 @@
-import { CompositeDisposable } from "atom";
+import { CompositeDisposable, Disposable } from "atom";
 import type { TextEditor } from "atom";
 import type { StatusBar } from "atom/status-bar";
 import { AutoLanguageClient } from "atom-languageclient";
@@ -25,7 +25,8 @@ import { observeOnSaveFormatter } from "./formatter";
 
 class DenoLanguageClient extends AutoLanguageClient {
   config: atomConfig = config;
-  request!: DenoCustomRequest;
+  request!: DenoCustomRequests;
+  notification!: DenoCustomNotifications;
   #subscriptions!: CompositeDisposable;
   getGrammarScopes() {
     return [
@@ -51,15 +52,23 @@ class DenoLanguageClient extends AutoLanguageClient {
     const initializationOptions = atom.config.get("atom-ide-deno.lspFlags");
     // filter empty string
     initializationOptions.importMap = initializationOptions.importMap || void 0;
+    initializationOptions.cache = initializationOptions.cache || void 0;
     initializationOptions.config = initializationOptions.config || void 0;
     // suggest.imports.hosts の入力はArrayだが、渡すときにObjectに変換する必要がある
     // https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md
     try {
-      initializationOptions.suggest.imports.hosts = Object.fromEntries(
-        initializationOptions.suggest.imports.hosts.map((
-          v: string,
-        ) => [v, true]),
-      );
+      initializationOptions.suggest.imports.hosts = {
+        ...Object.fromEntries(
+          initializationOptions.suggest.imports.hosts.map((
+            v: string,
+          ) => [v, true]),
+        ),
+        ...Object.fromEntries(
+          initializationOptions.suggest.imports.excludedHosts.map((
+            v: string,
+          ) => [v, false]),
+        ),
+      };
     } catch (e) {
       console.log(e);
     }
@@ -77,7 +86,8 @@ class DenoLanguageClient extends AutoLanguageClient {
     );
     super.activate();
     this.#subscriptions = new CompositeDisposable();
-    this.request = new DenoCustomRequest(this);
+    this.request = new DenoCustomRequests(this);
+    this.notification = new DenoCustomNotifications();
     this.#subscriptions.add(
       debouncedConfigOnDidChange(
         "atom-ide-deno.lspFlags",
@@ -93,6 +103,50 @@ class DenoLanguageClient extends AutoLanguageClient {
       createVirtualDocumentOpener(this),
       new CommandResolver(this),
       observeOnSaveFormatter(),
+      this.notification.onRegistryState((registry) => {
+        if (registry.suggestions) {
+          // add host to imports.hosts
+          atom.config.set("atom-ide-deno.lspFlags.suggest.imports.hosts", [
+            ...new Set(
+              atom.config.get("atom-ide-deno.lspFlags.suggest.imports.hosts"),
+            ).add(registry.origin),
+          ]);
+          // remove host from imports.excludedHosts
+          const excludedHosts = new Set(
+            atom.config.get(
+              "atom-ide-deno.lspFlags.suggest.imports.excludedHosts",
+            ),
+          );
+          excludedHosts.delete(registry.origin);
+          atom.config.set(
+            "atom-ide-deno.lspFlags.suggest.imports.excludedHosts",
+            [...excludedHosts],
+          );
+        } else {
+          // remove host from imports.hosts
+          const excludedHosts = new Set(
+            atom.config.get(
+              "atom-ide-deno.lspFlags.suggest.imports.hosts",
+            ),
+          );
+          excludedHosts.delete(registry.origin);
+          atom.config.set(
+            "atom-ide-deno.lspFlags.suggest.imports.hosts",
+            [...excludedHosts],
+          );
+          // add host to imports.excludedHosts
+          atom.config.set(
+            "atom-ide-deno.lspFlags.suggest.imports.excludedHosts",
+            [
+              ...new Set(
+                atom.config.get(
+                  "atom-ide-deno.lspFlags.suggest.imports.excludedHosts",
+                ),
+              ).add(registry.origin),
+            ],
+          );
+        }
+      }),
     );
     autoConfig.activate({ grammarScopes: this.getGrammarScopes() });
   }
@@ -104,7 +158,6 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   restartAllServers(...args: []) {
     logger.log("restart Deno Language server");
-    atom.notifications.addInfo("restart Deno Language server");
     return super.restartAllServers(...args);
   }
   getLogger(): Logger {
@@ -117,6 +170,7 @@ class DenoLanguageClient extends AutoLanguageClient {
   preInitialization(conn: LanguageClientConnection) {
     super.preInitialization(conn);
     addHookToConnection(conn);
+    this.notification.addConnection(conn);
   }
   isFileInProject() {
     return true;
@@ -148,7 +202,7 @@ class DenoLanguageClient extends AutoLanguageClient {
 export type { DenoLanguageClient };
 export default new DenoLanguageClient();
 
-export class DenoCustomRequest {
+class DenoCustomRequests {
   #client: DenoLanguageClient;
   #emptyConnection?: LanguageClientConnection;
   constructor(client: DenoLanguageClient) {
@@ -239,3 +293,48 @@ interface CustomRequest {
     return: string;
   };
 }
+
+class DenoCustomNotifications {
+  #notificationCallbacks: CustomNotificationRegistry;
+  constructor() {
+    this.#notificationCallbacks = {
+      "deno/registryState": new Set(),
+    };
+  }
+  addConnection(connection: LanguageClientConnection) {
+    connection.onCustomNotification("deno/registryState", (arg) => {
+      for (
+        const callback of this.#notificationCallbacks["deno/registryState"]
+      ) {
+        callback(arg as CustomNotificationParameter<"deno/registryState">);
+      }
+    });
+  }
+  onRegistryState(
+    callback: CustomNotificationCallback<"deno/registryState">,
+  ): Disposable {
+    this.#notificationCallbacks["deno/registryState"].add(callback);
+    return new Disposable(() => {
+      this.#notificationCallbacks["deno/registryState"].delete(callback);
+    });
+  }
+}
+
+interface CustomNotification {
+  "deno/registryState": {
+    param: {
+      origin: string;
+      suggestions: boolean;
+    };
+  };
+}
+
+type CustomNotificationName = keyof CustomNotification;
+type CustomNotificationParameter<T extends CustomNotificationName> =
+  CustomNotification[T]["param"];
+type CustomNotificationCallback<T extends CustomNotificationName> = (
+  arg: CustomNotificationParameter<T>,
+) => void;
+type CustomNotificationRegistry = {
+  [key in CustomNotificationName]: Set<CustomNotificationCallback<key>>;
+};
