@@ -43,7 +43,7 @@
     "@types/atom": "^1.40.11",
     "@types/node": "^17.0.41",
     "atom-select-list": "^0.8.1",
-    "deno-bin": "^1.11.5",
+    "deno-bin": "^1.22.2",
     "vscode-languageserver-protocol": "^3.17.1"
   },
   "atomTranspilers": [
