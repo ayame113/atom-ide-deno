@@ -1,6 +1,6 @@
 import { TextEditor } from "atom";
 import type { Disposable } from "atom";
-import { Convert } from "atom-languageclient";
+import { sep } from "path";
 
 import type { DenoLanguageClient } from "./main";
 import { trapMethod } from "./utils";
@@ -10,18 +10,20 @@ export function createVirtualDocumentOpener(
 ): Disposable {
   //virtual documentを表示
   return atom.workspace.addOpener((filePath) => {
-    if (!filePath.startsWith("deno-code://")) {
+    const prefix = `${atom.project.getPaths()[0] || ""}${sep}`;
+    if (!filePath.startsWith(`${prefix}deno:`)) {
       return;
     }
+    const path = filePath.slice(prefix.length).replace(/\\/g, "/");
     //autoHeightが無いとスクロールバーが出ない
     const editor = new TextEditor({ autoHeight: false });
     //言語モードを設定
     atom.grammars.assignLanguageMode(
       editor.getBuffer(),
-      atom.grammars.selectGrammar(filePath, "" /*sourceText*/).scopeName,
+      atom.grammars.selectGrammar(path, "" /*sourceText*/).scopeName,
     );
     // パスの設定
-    editor.getBuffer().getPath = () => filePath;
+    editor.getBuffer().getPath = () => path;
     // 保存時の「無効なパス」エラーを回避
     editor.save = () => Promise.resolve();
     editor.saveAs = () => Promise.resolve();
@@ -30,8 +32,8 @@ export function createVirtualDocumentOpener(
     //読み取り専用
     editor.setReadOnly(true);
     //タブ名
-    editor.getTitle = () => filePath;
-    editor.getLongTitle = () => filePath;
+    editor.getTitle = () => path;
+    editor.getLongTitle = () => path;
     //保存を無効にする
     // @ts-ignore: no type
     editor.shouldPromptToSave = () => false;
@@ -56,13 +58,13 @@ export function createVirtualDocumentOpener(
       try {
         const doc = await client.request.virtualTextDocument({
           textDocument: {
-            uri: Convert.pathToUri(filePath),
+            uri: path,
           },
         });
         editor.setText(doc, { bypassReadOnly: true });
       } catch {
         editor.setText(
-          `// load was failed. (${filePath})`,
+          `// load was failed. (${path})`,
           { bypassReadOnly: true },
         );
       } finally {

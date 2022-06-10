@@ -186,13 +186,24 @@ export const config: atomConfig = {
         default: false,
         order: 3,
       },
+      enablePaths: {
+        title: "Partially Deno enabling a workspace",
+        description:
+          "If set, indicates that only the paths in the workspace should be Deno enabled.",
+        type: "array",
+        default: [],
+        order: 4,
+        items: {
+          type: "string",
+        },
+      },
       importMap: {
         title: "Path to import-map",
         description:
           "Relative path from the project root (ex. `./import-map.json`)",
         type: "string",
         default: "",
-        order: 4,
+        order: 5,
       },
       cache: {
         title: "Path to cache directory",
@@ -200,7 +211,7 @@ export const config: atomConfig = {
           "Specify an explicit path to the `deno` cache instead of using DENO_DIR or the OS default.",
         type: "string",
         default: "",
-        order: 5,
+        order: 6,
       },
       config: {
         title: "Path to tsconfig",
@@ -208,12 +219,39 @@ export const config: atomConfig = {
           "Relative path from the project root (ex. `./tsconfig.json`)",
         type: "string",
         default: "",
-        order: 6,
+        order: 7,
+      },
+      certificateStores: {
+        title: "certificate stores",
+        description: "",
+        type: "array",
+        default: [],
+        order: 8,
+        items: {
+          type: "string",
+        },
+      },
+      tlsCertificate: {
+        title: "TLS Certificate",
+        description: "",
+        type: "string",
+        default: "",
+        order: 9,
+      },
+      unsafelyIgnoreCertificateErrors: {
+        title: "(unsafe) Ignore Certificate Errors",
+        description: "Disables verification of TLS certificates.",
+        type: "array",
+        default: [],
+        order: 10,
+        items: {
+          type: "string",
+        },
       },
       codeLens: {
         title: "code lens",
         type: "object",
-        order: 7,
+        order: 11,
         properties: {
           implementations: {
             title: "Enables implementations",
@@ -245,7 +283,7 @@ export const config: atomConfig = {
       suggest: {
         title: "suggest",
         type: "object",
-        order: 8,
+        order: 12,
         properties: {
           autoImports: {
             title: "Enables auto imports",
@@ -310,6 +348,14 @@ export const config: atomConfig = {
           },
         },
       },
+      internalDebug: {
+        title: "Enables internal debug",
+        description:
+          "A flag that enables additional internal debug information to be printed to the _Deno Language Server_ output.",
+        type: "boolean",
+        default: false,
+        order: 13,
+      },
     },
   },
   format: {
@@ -339,23 +385,35 @@ export const config: atomConfig = {
                 default: true,
                 order: 1,
               },
+              "source_jsx": {
+                title: "JavaScript",
+                type: "boolean",
+                default: true,
+                order: 2,
+              },
               "source_ts": {
                 title: "TypeScript",
                 type: "boolean",
                 default: true,
-                order: 2,
+                order: 3,
+              },
+              "source_tsx": {
+                title: "TypeScript",
+                type: "boolean",
+                default: true,
+                order: 4,
               },
               "source_gfm": {
                 title: "markdown",
                 type: "boolean",
                 default: true,
-                order: 3,
+                order: 5,
               },
               "source_json": {
                 title: "json",
                 type: "boolean",
                 default: true,
-                order: 4,
+                order: 6,
               },
             },
           },
@@ -379,10 +437,30 @@ export const config: atomConfig = {
       },
     },
   },
+  cache: {
+    title: "Cache options",
+    type: "object",
+    order: 4,
+    properties: {
+      onSave: {
+        title: "Cache on save",
+        type: "object",
+        order: 1,
+        properties: {
+          enable: {
+            title: "enables",
+            type: "boolean",
+            default: true,
+            order: 1,
+          },
+        },
+      },
+    },
+  },
   advanced: {
     title: "Advanced",
     type: "object",
-    order: 4,
+    order: 5,
     properties: {
       debugMode: {
         title: "debug mode",
@@ -399,7 +477,7 @@ export const config: atomConfig = {
       "Path to the deno executable.（ex. `/usr/bin/deno`, `C:\\\\Program Files\\\\deno\\\\deno.exe`）",
     type: "string",
     default: "",
-    order: 5,
+    order: 6,
   },
 };
 
