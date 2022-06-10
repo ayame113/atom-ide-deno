@@ -16,12 +16,13 @@ import path from "path";
 import { config, debouncedConfigOnDidChange } from "./config";
 import type { atomConfig } from "./config";
 import * as autoConfig from "./auto_config";
-import { addHookToConnection } from "./connection_hook";
 import { CommandResolver } from "./command_resolver";
 import { createVirtualDocumentOpener } from "./virtual_documet";
 import { getDenoPath } from "./utils";
 import { logger } from "./logger";
 import { observeOnSaveFormatter } from "./formatter";
+import { observeOnSaveCache } from "./cache";
+import * as grammar from "./grammar";
 
 class DenoLanguageClient extends AutoLanguageClient {
   config: atomConfig = config;
@@ -54,6 +55,8 @@ class DenoLanguageClient extends AutoLanguageClient {
     initializationOptions.importMap = initializationOptions.importMap || void 0;
     initializationOptions.cache = initializationOptions.cache || void 0;
     initializationOptions.config = initializationOptions.config || void 0;
+    initializationOptions.tlsCertificate =
+      initializationOptions.tlsCertificate || void 0;
     // suggest.imports.hosts の入力はArrayだが、渡すときにObjectに変換する必要がある
     // https://github.com/denoland/vscode_deno/blob/main/docs/ImportCompletions.md
     try {
@@ -103,6 +106,7 @@ class DenoLanguageClient extends AutoLanguageClient {
       createVirtualDocumentOpener(this),
       new CommandResolver(this),
       observeOnSaveFormatter(),
+      observeOnSaveCache(),
       this.notification.onRegistryState((registry) => {
         if (registry.suggestions) {
           // add host to imports.hosts
@@ -149,6 +153,7 @@ class DenoLanguageClient extends AutoLanguageClient {
       }),
     );
     autoConfig.activate({ grammarScopes: this.getGrammarScopes() });
+    grammar.activate();
   }
   async deactivate() {
     logger.log("deactivating...");
@@ -169,7 +174,6 @@ class DenoLanguageClient extends AutoLanguageClient {
   }
   preInitialization(conn: LanguageClientConnection) {
     super.preInitialization(conn);
-    addHookToConnection(conn);
     this.notification.addConnection(conn);
   }
   isFileInProject() {
