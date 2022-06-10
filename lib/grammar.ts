@@ -3,11 +3,11 @@ function addGrammar(scope: string, fileType: string) {
   if (!grammar) {
     return false;
   }
-  // @ts-ignore
+  // @ts-ignore: avoid type error
   if (grammar.fileTypes.includes(fileType)) {
     return false;
   }
-  // @ts-ignore
+  // @ts-ignore: avoid type error
   grammar.fileTypes.push(fileType);
   return true;
 }
@@ -22,15 +22,15 @@ export function activate() {
       addGrammar("source.ts", "cts"),
     ];
     if (isUpdateds.some((v) => v)) {
-      // @ts-ignore
+      // @ts-ignore: avoid type error
       atom.grammars.grammarAddedOrUpdated(
         atom.grammars.grammarForScopeName("source.json")!,
       );
-      // @ts-ignore
+      // @ts-ignore: avoid type error
       atom.grammars.grammarAddedOrUpdated(
         atom.grammars.grammarForScopeName("source.js")!,
       );
-      // @ts-ignore
+      // @ts-ignore: avoid type error
       atom.grammars.grammarAddedOrUpdated(
         atom.grammars.grammarForScopeName("source.ts")!,
       );
