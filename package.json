@@ -1,7 +1,7 @@
 {
   "name": "atom-ide-deno",
   "main": "./lib/main",
-  "version": "1.22.0",
+  "version": "1.23.0",
   "description": "JavaScript and TypeScript language support with deno for Atom-IDE",
   "keywords": [
     "deno",
